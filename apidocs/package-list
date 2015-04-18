@@ -1,0 +1,7 @@
+com.rspective.voucherify.client
+com.rspective.voucherify.client.api
+com.rspective.voucherify.client.callback
+com.rspective.voucherify.client.exception
+com.rspective.voucherify.client.model
+com.rspective.voucherify.client.module
+com.rspective.voucherify.client.utils
