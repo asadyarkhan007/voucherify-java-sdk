@@ -14,8 +14,8 @@
 
 	<section class="full-container primary title">
 		<div class="container">
-			<h1>{{ Plugin title }}</h1>
-			<h2>v0.0.1</h2>
+			<h1>voucherify-java-sdk</h1>
+			<h2>v1.0.0</h2>
 			<div class="rating rating-main"></div>
 			<div class="buttons">
 				<!-- GITHUB LINKS -->
@@ -42,7 +42,8 @@
 				<nav>
 					<ul>
 						<li>
-							<a href="#menu-option" data-menu-duration="500">Options</a>
+							<a href="#menu-usage" data-menu-duration="500">Usage</a>
+							<a href="#menu-proguard" data-menu-duration="500">Proguard</a>
 						</li>
 					</ul>
 				</nav>
@@ -53,26 +54,108 @@
 	<section class="full-container description">
 		<div class="container text-justify">
 			<p>
-				Description
+				Java SDK for Voucherify API.</br></br>
+
+				Voucherify is a....</br></br>
+
+				NOTE:</br>
+				The SDK requires at least Java 6 or Android 2.3.3 (API 10)</br></br>
+
+
+
+				You can browse the <a href="http://rspective.github.io/voucherify-java-sdk/apidocs/index.html">javadoc</a> for more information.
 			</p>
 		</div>
 	</section>
 
-	<section class="full-container" id="menu-option" data-menu-offset="-100">
+	<section class="full-container" id="menu-proguard" data-menu-offset="-100">
 		<div class="container">
-    		<h2>Option</h2>
+    		<h2>Proguard</h2>
     		<div class="row">
+
 				<div class="col-xs-12">
-					<h3>Code example values</h3>
+
+		<pre>
+-keepattributes Signature
+-dontwarn rx.**
+-dontwarn retrofit.**
+-keep class retrofit.** { *; }
+-keep class com.rspective.voucherify.client.** { *; }
+-keep class * extends com.rspective.voucherify.client.model.** { *; }
+-keep class com.google.gson.** { *; }
+-keep class sun.misc.Unsafe { *; }
+		</pre>
+			</div>
+		</div>
+	</section>
+
+
+	<section class="full-container" id="menu-usage" data-menu-offset="-100">
+		<div class="container">
+    		<h2>Examples of usage</h2>
+    		<div class="row">
+
+				<div class="col-xs-12">
 					<p class="description text-justify">
-						Description fo your code example
+						The `VoucherifyClient` manages all your interaction with the Voucherify API.
 					</p>
 <pre>
-$(function($) {
-	console.log('Code example');
-})(jQuery);
+VoucherifyClient client = new VoucherifyClient.Builder()
+                                .setAppId("YOUR-APPLICATION-ID")
+                                .setAppToken("YOUR-APPLICATION-TOKEN")
+                                .build();
 </pre>
 				</div>
+
+				<p class="description text-justify">
+						Every method has a corresponding asynchronous extension which can be accessed through the `async()` or 'rx()' method of the vouchers module.
+					</p>
+
+					<pre>
+try {
+    Voucher voucher = client.vouchers().fetchOne(VOUCHER_CODE);
+} catch (RetrofitError e) {
+    // error
+}
+					</pre>
+
+							<p class="description text-justify">
+						or asynchronously
+					</p>
+
+					<pre>
+client.vouchers().async().fetchOne("VOUCHER_CODE", new VoucherifyCallback<Voucher>() {
+    @Override
+    public void onSuccess(Voucher result) {
+    }
+
+    @Override
+    public void onFailure(RetrofitError error) {
+    // error
+}
+					</pre>
+
+
+							<p class="description text-justify">
+						or using RxJava
+					</p>
+
+					<pre>
+client.vouchers()
+        .rx()
+        .fetchOne("VOUCHER_CODE")
+        .subscribeOn(Schedulers.io())
+        .subscribe(new Action1<Voucher>() {
+            @Override
+            public void call(Voucher vouchers) {
+
+            }
+        }, new Action1<Throwable>() {
+            @Override
+            public void call(Throwable throwable) {
+            }
+        });
+					</pre>
 			</div>
 		</div>
 	</section>
