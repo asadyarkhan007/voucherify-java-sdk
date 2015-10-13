@@ -1,4 +1,4 @@
-package pl.rspective.voucherify.client.model;
+package com.rspective.voucherify.client.model;
 
 public class VoucherRedemptionContext {
 

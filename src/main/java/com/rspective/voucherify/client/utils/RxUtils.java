@@ -1,6 +1,6 @@
-package pl.rspective.voucherify.client.utils;
+package com.rspective.voucherify.client.utils;
 
-import pl.rspective.voucherify.client.callback.VoucherifyCallback;
+import com.rspective.voucherify.client.callback.VoucherifyCallback;
 
 import java.util.concurrent.Executor;
 

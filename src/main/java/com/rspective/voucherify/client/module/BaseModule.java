@@ -1,11 +1,11 @@
-package pl.rspective.voucherify.client.module;
+package com.rspective.voucherify.client.module;
 
 import java.util.concurrent.Executor;
 
-import pl.rspective.voucherify.client.api.VoucherifyApi;
-import pl.rspective.voucherify.client.callback.VoucherifyCallback;
-import pl.rspective.voucherify.client.model.VoucherRedemptionContext;
-import pl.rspective.voucherify.client.utils.RxUtils;
+import com.rspective.voucherify.client.api.VoucherifyApi;
+import com.rspective.voucherify.client.callback.VoucherifyCallback;
+import com.rspective.voucherify.client.model.VoucherRedemptionContext;
+import com.rspective.voucherify.client.utils.RxUtils;
 import rx.Observable;
 
 /**

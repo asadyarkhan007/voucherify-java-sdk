@@ -1,6 +1,6 @@
-package pl.rspective.voucherify.client.module;
+package com.rspective.voucherify.client.module;
 
-import pl.rspective.voucherify.client.api.VoucherifyApi;
+import com.rspective.voucherify.client.api.VoucherifyApi;
 
 import java.util.concurrent.Executor;
 

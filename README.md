@@ -1,7 +1,7 @@
 voucherify-java-sdk
 ===============
 
-###Version: 1.6.0
+###Version: 1.7.0
 
 Java SDK for Voucherify API.
 
@@ -15,14 +15,14 @@ Setup
 Grab via Maven:
 ```xml
 <dependency>
-  <groupId>pl.rspective.voucherify.client</groupId>
+  <groupId>com.rspective.voucherify.client</groupId>
   <artifactId>voucherify-java-sdk</artifactId>
   <version>VERSION</version>
 </dependency>
 ```
 or via Gradle:
 ```groovy
-compile 'pl.rspective.voucherify.client:voucherify-java-sdk:VERSION'
+compile 'com.rspective.voucherify.client:voucherify-java-sdk:VERSION'
 ```
 
 NOTE:

@@ -1,10 +1,10 @@
-package pl.rspective.voucherify.client;
+package com.rspective.voucherify.client;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import pl.rspective.voucherify.client.api.VoucherifyApi;
-import pl.rspective.voucherify.client.module.VoucherModule;
-import pl.rspective.voucherify.client.utils.Platform;
+import com.rspective.voucherify.client.api.VoucherifyApi;
+import com.rspective.voucherify.client.module.VoucherModule;
+import com.rspective.voucherify.client.utils.Platform;
 import retrofit.RequestInterceptor;
 import retrofit.RestAdapter;
 import retrofit.client.Client;

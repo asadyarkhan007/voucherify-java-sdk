@@ -1,8 +1,8 @@
-package pl.rspective.voucherify.client.api;
+package com.rspective.voucherify.client.api;
 
-import pl.rspective.voucherify.client.model.Voucher;
-import pl.rspective.voucherify.client.model.VoucherRedemption;
-import pl.rspective.voucherify.client.model.VoucherRedemptionContext;
+import com.rspective.voucherify.client.model.Voucher;
+import com.rspective.voucherify.client.model.VoucherRedemption;
+import com.rspective.voucherify.client.model.VoucherRedemptionContext;
 import retrofit.http.Body;
 import retrofit.http.GET;
 import retrofit.http.POST;

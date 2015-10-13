@@ -1,4 +1,4 @@
-package pl.rspective.voucherify.client;
+package com.rspective.voucherify.client;
 
 /**
  * Holds all constants for voucherify java client
