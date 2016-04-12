@@ -2,6 +2,7 @@ pl.rspective.voucherify.client
 pl.rspective.voucherify.client.api
 pl.rspective.voucherify.client.callback
 pl.rspective.voucherify.client.exception
+pl.rspective.voucherify.client.json
 pl.rspective.voucherify.client.model
 pl.rspective.voucherify.client.module
 pl.rspective.voucherify.client.utils
