@@ -1,5 +1,6 @@
 package io.voucherify.client.module;
 
+import io.reactivex.Observable;
 import io.voucherify.client.api.VoucherifyApi;
 import io.voucherify.client.callback.VoucherifyCallback;
 import io.voucherify.client.model.voucher.AddBalance;
@@ -13,7 +14,7 @@ import io.voucherify.client.model.voucher.response.VouchersResponse;
 import io.voucherify.client.module.VoucherModule.ExtAsync;
 import io.voucherify.client.module.VoucherModule.ExtRxJava;
 import io.voucherify.client.utils.RxUtils;
-import rx.Observable;
+import io.voucherify.client.utils.response.EmptyResponse;
 
 import java.util.concurrent.Executor;
 
@@ -112,7 +113,7 @@ public final class VoucherModule extends AbsModule<ExtAsync, ExtRxJava> {
       RxUtils.subscribe(executor, rx().addBalance(code, addBalance), callback);
     }
 
-    public void importVouchers(ImportVouchers importVouchers, VoucherifyCallback<Void> callback) {
+    public void importVouchers(ImportVouchers importVouchers, VoucherifyCallback<EmptyResponse> callback) {
       RxUtils.subscribe(executor, rx().importVouchers(importVouchers), callback);
     }
   }
@@ -121,6 +122,7 @@ public final class VoucherModule extends AbsModule<ExtAsync, ExtRxJava> {
 
     public Observable<VoucherResponse> create(final CreateVoucher createVoucher) {
       return RxUtils.defer(new RxUtils.DefFunc<VoucherResponse>() {
+
         @Override
         public VoucherResponse method() {
           return VoucherModule.this.create(createVoucher);
@@ -130,6 +132,7 @@ public final class VoucherModule extends AbsModule<ExtAsync, ExtRxJava> {
 
     public Observable<VoucherResponse> get(final String code) {
       return RxUtils.defer(new RxUtils.DefFunc<VoucherResponse>() {
+
         @Override
         public VoucherResponse method() {
           return VoucherModule.this.get(code);
@@ -139,6 +142,7 @@ public final class VoucherModule extends AbsModule<ExtAsync, ExtRxJava> {
 
     public Observable<VoucherResponse> update(final String code, final VoucherUpdate voucherUpdate) {
       return RxUtils.defer(new RxUtils.DefFunc<VoucherResponse>() {
+
         @Override
         public VoucherResponse method() {
           return VoucherModule.this.update(code, voucherUpdate);
@@ -146,18 +150,20 @@ public final class VoucherModule extends AbsModule<ExtAsync, ExtRxJava> {
       });
     }
 
-    public Observable<Void> delete(final String code, final Boolean force) {
-      return RxUtils.defer(new RxUtils.DefFunc<Void>() {
+    public Observable<EmptyResponse> delete(final String code, final Boolean force) {
+      return RxUtils.defer(new RxUtils.DefFunc<EmptyResponse>() {
+
         @Override
-        public Void method() {
+        public EmptyResponse method() {
           VoucherModule.this.delete(code, force);
-          return null;
+          return EmptyResponse.create();
         }
       });
     }
 
     public Observable<VouchersResponse> list(final VouchersFilter vouchersFilter) {
       return RxUtils.defer(new RxUtils.DefFunc<VouchersResponse>() {
+
         @Override
         public VouchersResponse method() {
           return VoucherModule.this.list(vouchersFilter);
@@ -167,6 +173,7 @@ public final class VoucherModule extends AbsModule<ExtAsync, ExtRxJava> {
 
     public Observable<VoucherResponse> disable(final String code) {
       return RxUtils.defer(new RxUtils.DefFunc<VoucherResponse>() {
+
         @Override
         public VoucherResponse method() {
           return VoucherModule.this.disable(code);
@@ -176,6 +183,7 @@ public final class VoucherModule extends AbsModule<ExtAsync, ExtRxJava> {
 
     public Observable<VoucherResponse> enable(final String code) {
       return RxUtils.defer(new RxUtils.DefFunc<VoucherResponse>() {
+
         @Override
         public VoucherResponse method() {
           return VoucherModule.this.enable(code);
@@ -185,6 +193,7 @@ public final class VoucherModule extends AbsModule<ExtAsync, ExtRxJava> {
 
     public Observable<AddBalanceResponse> addBalance(final String code, final AddBalance addBalance) {
       return RxUtils.defer(new RxUtils.DefFunc<AddBalanceResponse>() {
+
         @Override
         public AddBalanceResponse method() {
           return VoucherModule.this.addBalance(code, addBalance);
@@ -192,12 +201,13 @@ public final class VoucherModule extends AbsModule<ExtAsync, ExtRxJava> {
       });
     }
 
-    public Observable<Void> importVouchers(final ImportVouchers importVouchers) {
-      return RxUtils.defer(new RxUtils.DefFunc<Void>() {
+    public Observable<EmptyResponse> importVouchers(final ImportVouchers importVouchers) {
+      return RxUtils.defer(new RxUtils.DefFunc<EmptyResponse>() {
+
         @Override
-        public Void method() {
+        public EmptyResponse method() {
           VoucherModule.this.importVouchers(importVouchers);
-          return null;
+          return EmptyResponse.create();
         }
       });
     }

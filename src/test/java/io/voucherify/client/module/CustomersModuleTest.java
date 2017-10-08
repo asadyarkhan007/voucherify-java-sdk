@@ -1,11 +1,12 @@
 package io.voucherify.client.module;
 
-import com.squareup.okhttp.mockwebserver.RecordedRequest;
-import org.junit.Test;
+import io.reactivex.Observable;
 import io.voucherify.client.callback.VoucherifyCallback;
 import io.voucherify.client.model.customer.Customer;
 import io.voucherify.client.model.customer.response.CustomerResponse;
-import rx.Observable;
+import io.voucherify.client.utils.response.EmptyResponse;
+import okhttp3.mockwebserver.RecordedRequest;
+import org.junit.Test;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -17,10 +18,10 @@ public class CustomersModuleTest extends AbstractModuleTest {
   public void shouldCreateCustomer() {
     // given
     Customer customer = Customer.builder()
-            .email("email")
-            .phone("phone")
-            .description("description")
-            .build();
+        .email("email")
+        .phone("phone")
+        .description("description")
+        .build();
 
     enqueueResponse(customer);
 
@@ -38,10 +39,10 @@ public class CustomersModuleTest extends AbstractModuleTest {
   public void shouldGetCustomer() {
     // given
     Customer customer = Customer.builder()
-            .email("email")
-            .phone("phone")
-            .description("description")
-            .build();
+        .email("email")
+        .phone("phone")
+        .description("description")
+        .build();
 
     enqueueResponse(customer);
 
@@ -59,11 +60,11 @@ public class CustomersModuleTest extends AbstractModuleTest {
   public void shouldUpdateCustomer() {
     // given
     Customer customer = Customer.builder()
-            .id("customer-id")
-            .email("email")
-            .phone("phone")
-            .description("description")
-            .build();
+        .id("customer-id")
+        .email("email")
+        .phone("phone")
+        .description("description")
+        .build();
 
     enqueueResponse(customer);
 
@@ -97,10 +98,10 @@ public class CustomersModuleTest extends AbstractModuleTest {
   public void shouldCreateCustomerAsync() {
     // given
     Customer customer = Customer.builder()
-            .email("email")
-            .phone("phone")
-            .description("description")
-            .build();
+        .email("email")
+        .phone("phone")
+        .description("description")
+        .build();
 
     enqueueResponse(customer);
 
@@ -120,10 +121,10 @@ public class CustomersModuleTest extends AbstractModuleTest {
   public void shouldGetCustomerAsync() {
     // given
     Customer customer = Customer.builder()
-            .email("email")
-            .phone("phone")
-            .description("description")
-            .build();
+        .email("email")
+        .phone("phone")
+        .description("description")
+        .build();
 
     enqueueResponse(customer);
 
@@ -143,11 +144,11 @@ public class CustomersModuleTest extends AbstractModuleTest {
   public void shouldUpdateCustomerAsync() {
     // given
     Customer customer = Customer.builder()
-            .id("customer-id")
-            .email("email")
-            .phone("phone")
-            .description("description")
-            .build();
+        .id("customer-id")
+        .email("email")
+        .phone("phone")
+        .description("description")
+        .build();
 
     enqueueResponse(customer);
 
@@ -186,10 +187,10 @@ public class CustomersModuleTest extends AbstractModuleTest {
   public void shouldCreateCustomerRxJava() {
     // given
     Customer customer = Customer.builder()
-            .email("email")
-            .phone("phone")
-            .description("description")
-            .build();
+        .email("email")
+        .phone("phone")
+        .description("description")
+        .build();
 
     enqueueResponse(customer);
 
@@ -197,7 +198,7 @@ public class CustomersModuleTest extends AbstractModuleTest {
     Observable<CustomerResponse> observable = client.customers().rx().create(customer);
 
     // then
-    CustomerResponse result = observable.toBlocking().first();
+    CustomerResponse result = observable.blockingFirst();
     assertThat(result).isNotNull();
     RecordedRequest request = getRequest();
     assertThat(request.getPath()).isEqualTo("/customers");
@@ -208,10 +209,10 @@ public class CustomersModuleTest extends AbstractModuleTest {
   public void shouldGetCustomerRxJava() {
     // given
     Customer customer = Customer.builder()
-            .email("email")
-            .phone("phone")
-            .description("description")
-            .build();
+        .email("email")
+        .phone("phone")
+        .description("description")
+        .build();
 
     enqueueResponse(customer);
 
@@ -219,7 +220,7 @@ public class CustomersModuleTest extends AbstractModuleTest {
     Observable<CustomerResponse> observable = client.customers().rx().get("customer-id");
 
     // then
-    CustomerResponse result = observable.toBlocking().first();
+    CustomerResponse result = observable.blockingFirst();
     assertThat(result).isNotNull();
     RecordedRequest request = getRequest();
     assertThat(request.getPath()).isEqualTo("/customers/customer-id");
@@ -230,11 +231,11 @@ public class CustomersModuleTest extends AbstractModuleTest {
   public void shouldUpdateCustomerRxJava() {
     // given
     Customer customer = Customer.builder()
-            .id("customer-id")
-            .email("email")
-            .phone("phone")
-            .description("description")
-            .build();
+        .id("customer-id")
+        .email("email")
+        .phone("phone")
+        .description("description")
+        .build();
 
     enqueueResponse(customer);
 
@@ -242,7 +243,7 @@ public class CustomersModuleTest extends AbstractModuleTest {
     Observable<CustomerResponse> observable = client.customers().rx().update(customer);
 
     // then
-    CustomerResponse result = observable.toBlocking().first();
+    CustomerResponse result = observable.blockingFirst();
     assertThat(result).isNotNull();
     RecordedRequest request = getRequest();
     assertThat(request.getPath()).isEqualTo("/customers/customer-id");
@@ -256,10 +257,10 @@ public class CustomersModuleTest extends AbstractModuleTest {
     enqueueEmptyResponse();
 
     // when
-    Observable<Void> observable = client.customers().rx().delete(customerId);
+    Observable<EmptyResponse> observable = client.customers().rx().delete(customerId);
 
     // then
-    observable.toBlocking().first();
+    observable.blockingFirst();
     RecordedRequest request = getRequest();
     assertThat(request.getPath()).isEqualTo("/customers/customer-id");
     assertThat(request.getMethod()).isEqualTo("DELETE");

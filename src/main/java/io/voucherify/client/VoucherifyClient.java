@@ -1,14 +1,12 @@
 package io.voucherify.client;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.databind.DeserializationConfig;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import io.voucherify.client.api.VoucherifyApi;
-import io.voucherify.client.error.VoucherifyErrorHandler;
-import io.voucherify.client.json.converter.JsonConverter;
+import io.voucherify.client.error.ErrorInterceptor;
 import io.voucherify.client.json.deserializer.CampaignsResponseDeserializer;
 import io.voucherify.client.json.deserializer.DateDeserializer;
 import io.voucherify.client.json.deserializer.VouchersResponseDeserializer;
@@ -25,9 +23,15 @@ import io.voucherify.client.module.ValidationRulesModule;
 import io.voucherify.client.module.ValidationsModule;
 import io.voucherify.client.module.VoucherModule;
 import io.voucherify.client.utils.Platform;
-import retrofit.RequestInterceptor;
-import retrofit.RestAdapter;
-import retrofit.client.Client;
+import io.voucherify.client.utils.adapter.sync.SyncCallAdapterFactory;
+import okhttp3.Headers;
+import okhttp3.Interceptor;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.logging.HttpLoggingInterceptor;
+import retrofit2.Retrofit;
+import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
+import retrofit2.converter.jackson.JacksonConverterFactory;
 
 import java.util.Date;
 import java.util.concurrent.Executor;
@@ -123,7 +127,45 @@ public class VoucherifyClient {
     return Platform.get().callbackExecutor();
   }
 
-  private JsonConverter createConverter(Builder builder) {
+  private String createHttpScheme(Builder builder) {
+    if (builder.secure) {
+      return Constants.SCHEME_HTTPS;
+    } else {
+      return Constants.SCHEME_HTTP;
+    }
+  }
+
+  private VoucherifyApi createRetrofitService(Builder builder) {
+    Retrofit.Builder restBuilder = new Retrofit.Builder()
+        .addCallAdapterFactory(new SyncCallAdapterFactory())
+        .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
+        .addConverterFactory(JacksonConverterFactory.create(createObjectMapper(builder)));
+
+    setEndPoint(builder, restBuilder);
+    setClient(builder, restBuilder);
+
+    return restBuilder.build().create(VoucherifyApi.class);
+  }
+
+  private void setClient(Builder builder, Retrofit.Builder retrofitBuilder) {
+    if (builder.client != null) {
+      retrofitBuilder.client(builder.client);
+    } else {
+      retrofitBuilder.client(createOkHttpClient(builder));
+    }
+  }
+
+  private OkHttpClient createOkHttpClient(Builder builder) {
+    OkHttpClient.Builder okBuilder = new OkHttpClient.Builder();
+
+    okBuilder.addInterceptor(createHeadersInterceptor(builder));
+    okBuilder.addInterceptor(createLoggingInterceptor(builder));
+    okBuilder.addInterceptor(new ErrorInterceptor());
+
+    return okBuilder.build();
+  }
+
+  private ObjectMapper createObjectMapper(Builder builder) {
     ObjectMapper mapper = new ObjectMapper();
     mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
     mapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
@@ -135,58 +177,36 @@ public class VoucherifyClient {
     jsonParsingModule.addDeserializer(CampaignsResponse.class, new CampaignsResponseDeserializer(builder.apiVersion));
     jsonParsingModule.addDeserializer(VouchersResponse.class, new VouchersResponseDeserializer(builder.apiVersion));
     mapper.registerModule(jsonParsingModule);
-    return new JsonConverter(mapper);
+    return mapper;
   }
 
-  private String createHttpScheme(Builder builder) {
-    if (builder.secure) {
-      return Constants.SCHEME_HTTPS;
-    } else {
-      return Constants.SCHEME_HTTP;
-    }
-  }
+  private Interceptor createHeadersInterceptor(final Builder builder) {
+    return chain -> {
+      Request request = chain.request();
+      Headers.Builder headersBuilder = request.headers().newBuilder()
+          .add(Constants.HTTP_HEADER_VOUCHERIFY_CHANNEL, Constants.VOUCHERIFY_CHANNEL_NAME)
+          .add(Constants.HTTP_HEADER_APP_ID, builder.appId)
+          .add(Constants.HTTP_HEADER_APP_TOKEN, builder.clientSecretKey);
 
-  private VoucherifyApi createRetrofitService(Builder builder) {
-    RestAdapter.Builder restBuilder = new RestAdapter.Builder()
-            .setConverter(createConverter(builder))
-            .setRequestInterceptor(createInterceptor(builder));
-
-    setEndPoint(builder, restBuilder);
-    setClientProvider(builder, restBuilder);
-    setLogLevel(builder, restBuilder);
-    setErrorHandler(restBuilder);
-
-    return restBuilder.build().create(VoucherifyApi.class);
-  }
-
-  private RequestInterceptor createInterceptor(final Builder builder) {
-    return new RequestInterceptor() {
-      @Override
-      public void intercept(RequestFacade request) {
-        request.addHeader(Constants.HTTP_HEADER_VOUCHERIFY_CHANNEL, Constants.VOUCHERIFY_CHANNEL_NAME);
-        request.addHeader(Constants.HTTP_HEADER_APP_ID, builder.appId);
-        request.addHeader(Constants.HTTP_HEADER_APP_TOKEN, builder.clientSecretKey);
-
-        if (builder.apiVersion != null) {
-          request.addHeader(Constants.HTTP_HEADER_VOUCHERIFY_API_VERSION, builder.apiVersion.getValue());
-        }
+      if (builder.apiVersion != null) {
+        headersBuilder.add(Constants.HTTP_HEADER_VOUCHERIFY_API_VERSION, builder.apiVersion.getValue());
       }
+
+      return chain.proceed(request.newBuilder().headers(headersBuilder.build()).build());
     };
   }
 
-  private void setLogLevel(Builder builder, RestAdapter.Builder restBuilder) {
+  private HttpLoggingInterceptor createLoggingInterceptor(final Builder builder) {
+    HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
     if (builder.logLevel != null) {
-      restBuilder.setLogLevel(builder.logLevel);
+      logging.setLevel(builder.logLevel.toHttpLogLevel());
+    } else {
+      logging.setLevel(HttpLoggingInterceptor.Level.NONE);
     }
+    return logging;
   }
 
-  private void setClientProvider(Builder builder, RestAdapter.Builder restBuilder) {
-    if (builder.clientProvider != null) {
-      restBuilder.setClient(builder.clientProvider);
-    }
-  }
-
-  private void setEndPoint(Builder builder, RestAdapter.Builder restBuilder) {
+  private void setEndPoint(Builder builder, Retrofit.Builder retrofitBuilder) {
     String endpoint;
 
     if (builder.endpoint == null) {
@@ -195,11 +215,7 @@ public class VoucherifyClient {
       endpoint = builder.endpoint;
     }
 
-    restBuilder.setEndpoint(String.format("%s://%s", httpScheme, endpoint));
-  }
-
-  private void setErrorHandler(RestAdapter.Builder restBuilder) {
-    restBuilder.setErrorHandler(new VoucherifyErrorHandler());
+    retrofitBuilder.baseUrl(String.format("%s://%s", httpScheme, endpoint));
   }
 
   public static class Builder {
@@ -212,9 +228,9 @@ public class VoucherifyClient {
 
     boolean secure;
 
-    RestAdapter.LogLevel logLevel;
+    LogLevel logLevel;
 
-    Client.Provider clientProvider;
+    OkHttpClient client;
 
     ApiVersion apiVersion;
 
@@ -240,17 +256,12 @@ public class VoucherifyClient {
       return this;
     }
 
-    public Builder setClient(final Client client) {
+    public Builder setClient(final OkHttpClient client) {
       if (client == null) {
         throw new IllegalArgumentException("Cannot call setClient() with null.");
       }
-
-      return setClientProvider(new Client.Provider() {
-        @Override
-        public Client get() {
-          return client;
-        }
-      });
+      this.client = client;
+      return this;
     }
 
     public Builder setEndpoint(String remoteUrl) {
@@ -263,16 +274,7 @@ public class VoucherifyClient {
       return this;
     }
 
-    public Builder setClientProvider(Client.Provider clientProvider) {
-      if (clientProvider == null) {
-        throw new IllegalArgumentException("Cannot call setClientProvider() with null.");
-      }
-
-      this.clientProvider = clientProvider;
-      return this;
-    }
-
-    public Builder setLogLevel(RestAdapter.LogLevel logLevel) {
+    public Builder setLogLevel(LogLevel logLevel) {
       if (logLevel == null) {
         throw new IllegalArgumentException("Cannot call setLogLevel() with null.");
       }

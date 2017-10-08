@@ -1,13 +1,14 @@
 package io.voucherify.client.module;
 
-import io.voucherify.client.model.segment.Segment;
-import io.voucherify.client.model.segment.response.SegmentResponse;
+import io.reactivex.Observable;
 import io.voucherify.client.api.VoucherifyApi;
 import io.voucherify.client.callback.VoucherifyCallback;
+import io.voucherify.client.model.segment.Segment;
+import io.voucherify.client.model.segment.response.SegmentResponse;
 import io.voucherify.client.module.SegmentsModule.ExtAsync;
 import io.voucherify.client.module.SegmentsModule.ExtRxJava;
 import io.voucherify.client.utils.RxUtils;
-import rx.Observable;
+import io.voucherify.client.utils.response.EmptyResponse;
 
 import java.util.concurrent.Executor;
 
@@ -59,7 +60,7 @@ public final class SegmentsModule extends AbsModule<ExtAsync, ExtRxJava> {
       RxUtils.subscribe(executor, rx().get(id), callback);
     }
 
-    public void delete(String id, VoucherifyCallback<Void> callback) {
+    public void delete(String id, VoucherifyCallback<EmptyResponse> callback) {
       RxUtils.subscribe(executor, rx().delete(id), callback);
     }
   }
@@ -68,6 +69,7 @@ public final class SegmentsModule extends AbsModule<ExtAsync, ExtRxJava> {
 
     public Observable<SegmentResponse> create(final Segment segment) {
       return RxUtils.defer(new RxUtils.DefFunc<SegmentResponse>() {
+
         @Override
         public SegmentResponse method() {
           return SegmentsModule.this.create(segment);
@@ -77,6 +79,7 @@ public final class SegmentsModule extends AbsModule<ExtAsync, ExtRxJava> {
 
     public Observable<SegmentResponse> get(final String id) {
       return RxUtils.defer(new RxUtils.DefFunc<SegmentResponse>() {
+
         @Override
         public SegmentResponse method() {
           return SegmentsModule.this.get(id);
@@ -84,12 +87,13 @@ public final class SegmentsModule extends AbsModule<ExtAsync, ExtRxJava> {
       });
     }
 
-    public Observable<Void> delete(final String id) {
-      return RxUtils.defer(new RxUtils.DefFunc<Void>() {
+    public Observable<EmptyResponse> delete(final String id) {
+      return RxUtils.defer(new RxUtils.DefFunc<EmptyResponse>() {
+
         @Override
-        public Void method() {
+        public EmptyResponse method() {
           SegmentsModule.this.delete(id);
-          return null;
+          return EmptyResponse.create();
         }
       });
     }

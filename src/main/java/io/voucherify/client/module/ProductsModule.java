@@ -1,20 +1,21 @@
 package io.voucherify.client.module;
 
-import io.voucherify.client.model.product.ProductsFilter;
-import io.voucherify.client.model.product.SKU;
-import io.voucherify.client.model.product.response.ProductsResponse;
+import io.reactivex.Observable;
 import io.voucherify.client.api.VoucherifyApi;
 import io.voucherify.client.callback.VoucherifyCallback;
 import io.voucherify.client.model.product.DeleteProductParams;
 import io.voucherify.client.model.product.DeleteSKUParams;
 import io.voucherify.client.model.product.Product;
+import io.voucherify.client.model.product.ProductsFilter;
+import io.voucherify.client.model.product.SKU;
 import io.voucherify.client.model.product.response.ProductResponse;
+import io.voucherify.client.model.product.response.ProductsResponse;
 import io.voucherify.client.model.product.response.SKUResponse;
 import io.voucherify.client.model.product.response.SKUsResponse;
 import io.voucherify.client.module.ProductsModule.ExtAsync;
 import io.voucherify.client.module.ProductsModule.ExtRxJava;
 import io.voucherify.client.utils.RxUtils;
-import rx.Observable;
+import io.voucherify.client.utils.response.EmptyResponse;
 
 import java.util.concurrent.Executor;
 
@@ -102,7 +103,7 @@ public class ProductsModule extends AbsModule<ExtAsync, ExtRxJava> {
       RxUtils.subscribe(executor, rx().list(filter), callback);
     }
 
-    public void delete(String id, DeleteProductParams params, VoucherifyCallback<Void> callback) {
+    public void delete(String id, DeleteProductParams params, VoucherifyCallback<EmptyResponse> callback) {
       RxUtils.subscribe(executor, rx().delete(id, params), callback);
     }
 
@@ -122,7 +123,7 @@ public class ProductsModule extends AbsModule<ExtAsync, ExtRxJava> {
       RxUtils.subscribe(executor, rx().listSKU(productId), callback);
     }
 
-    public void deleteSKU(String productId, String skuId, DeleteSKUParams params, VoucherifyCallback<Void> callback) {
+    public void deleteSKU(String productId, String skuId, DeleteSKUParams params, VoucherifyCallback<EmptyResponse> callback) {
       RxUtils.subscribe(executor, rx().deleteSKU(productId, skuId, params), callback);
     }
   }
@@ -169,13 +170,13 @@ public class ProductsModule extends AbsModule<ExtAsync, ExtRxJava> {
       });
     }
 
-    public Observable<Void> delete(final String id, final DeleteProductParams params) {
-      return RxUtils.defer(new RxUtils.DefFunc<Void>() {
+    public Observable<EmptyResponse> delete(final String id, final DeleteProductParams params) {
+      return RxUtils.defer(new RxUtils.DefFunc<EmptyResponse>() {
 
         @Override
-        public Void method() {
+        public EmptyResponse method() {
           ProductsModule.this.delete(id, params);
-          return null;
+          return EmptyResponse.create();
         }
       });
     }
@@ -220,13 +221,13 @@ public class ProductsModule extends AbsModule<ExtAsync, ExtRxJava> {
       });
     }
 
-    public Observable<Void> deleteSKU(final String productId, final String skuId, final DeleteSKUParams params) {
-      return RxUtils.defer(new RxUtils.DefFunc<Void>() {
+    public Observable<EmptyResponse> deleteSKU(final String productId, final String skuId, final DeleteSKUParams params) {
+      return RxUtils.defer(new RxUtils.DefFunc<EmptyResponse>() {
 
         @Override
-        public Void method() {
+        public EmptyResponse method() {
           ProductsModule.this.deleteSKU(productId, skuId, params);
-          return null;
+          return EmptyResponse.create();
         }
       });
     }

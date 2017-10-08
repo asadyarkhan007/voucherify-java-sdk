@@ -1,5 +1,6 @@
 package io.voucherify.client.module;
 
+import io.reactivex.Observable;
 import io.voucherify.client.api.VoucherifyApi;
 import io.voucherify.client.callback.VoucherifyCallback;
 import io.voucherify.client.model.validation.VoucherValidation;
@@ -7,7 +8,6 @@ import io.voucherify.client.model.validation.VoucherValidationResponse;
 import io.voucherify.client.module.ValidationsModule.ExtAsync;
 import io.voucherify.client.module.ValidationsModule.ExtRxJava;
 import io.voucherify.client.utils.RxUtils;
-import rx.Observable;
 
 import java.util.concurrent.Executor;
 
@@ -52,6 +52,7 @@ public final class ValidationsModule extends AbsModule<ExtAsync, ExtRxJava> {
 
     public Observable<VoucherValidationResponse> validate(final String code, final VoucherValidation voucherValidation) {
       return RxUtils.defer(new RxUtils.DefFunc<VoucherValidationResponse>() {
+
         @Override
         public VoucherValidationResponse method() {
           return ValidationsModule.this.validate(code, voucherValidation);

@@ -27,6 +27,7 @@ public class CampaignsExample extends AbsExample {
     AddVoucherToCampaign addVoucherToCampaign = AddVoucherToCampaign.builder().category("new-category").build();
 
     client.campaigns().addVoucher(response.getName(), addVoucherToCampaign);
+
     client.campaigns().addVoucherWithCode(response.getName(), "some-code1", addVoucherToCampaign);
 
     CampaignImportVoucher campaignImportVoucher = CampaignImportVoucher.builder().active(false).code("test03").build();

@@ -1,19 +1,19 @@
 package io.voucherify.client.module;
 
-import io.voucherify.client.model.redemption.RollbackRedemption;
-import io.voucherify.client.model.redemption.response.RedemptionEntryResponse;
-import io.voucherify.client.model.redemption.response.RedemptionsResponse;
-import io.voucherify.client.model.redemption.response.RollbackRedemptionResponse;
-import io.voucherify.client.model.redemption.response.VoucherRedemptionsResponse;
+import io.reactivex.Observable;
 import io.voucherify.client.api.VoucherifyApi;
 import io.voucherify.client.callback.VoucherifyCallback;
 import io.voucherify.client.model.redemption.RedeemVoucher;
 import io.voucherify.client.model.redemption.RedemptionsFilter;
+import io.voucherify.client.model.redemption.RollbackRedemption;
 import io.voucherify.client.model.redemption.response.RedeemVoucherResponse;
+import io.voucherify.client.model.redemption.response.RedemptionEntryResponse;
+import io.voucherify.client.model.redemption.response.RedemptionsResponse;
+import io.voucherify.client.model.redemption.response.RollbackRedemptionResponse;
+import io.voucherify.client.model.redemption.response.VoucherRedemptionsResponse;
 import io.voucherify.client.module.RedemptionsModule.ExtAsync;
 import io.voucherify.client.module.RedemptionsModule.ExtRxJava;
 import io.voucherify.client.utils.RxUtils;
-import rx.Observable;
 
 import java.util.concurrent.Executor;
 
@@ -90,6 +90,7 @@ public final class RedemptionsModule extends AbsModule<ExtAsync, ExtRxJava> {
 
     public Observable<RedeemVoucherResponse> redeem(final String code, final RedeemVoucher redeemVoucher) {
       return RxUtils.defer(new RxUtils.DefFunc<RedeemVoucherResponse>() {
+
         @Override
         public RedeemVoucherResponse method() {
           return RedemptionsModule.this.redeem(code, redeemVoucher);
@@ -99,6 +100,7 @@ public final class RedemptionsModule extends AbsModule<ExtAsync, ExtRxJava> {
 
     public Observable<RedemptionEntryResponse> get(final String redemptionId) {
       return RxUtils.defer(new RxUtils.DefFunc<RedemptionEntryResponse>() {
+
         @Override
         public RedemptionEntryResponse method() {
           return RedemptionsModule.this.get(redemptionId);
@@ -108,6 +110,7 @@ public final class RedemptionsModule extends AbsModule<ExtAsync, ExtRxJava> {
 
     public Observable<RedemptionsResponse> list(final RedemptionsFilter redemptionsFilter) {
       return RxUtils.defer(new RxUtils.DefFunc<RedemptionsResponse>() {
+
         @Override
         public RedemptionsResponse method() {
           return RedemptionsModule.this.list(redemptionsFilter);
@@ -117,6 +120,7 @@ public final class RedemptionsModule extends AbsModule<ExtAsync, ExtRxJava> {
 
     public Observable<VoucherRedemptionsResponse> getForVoucher(final String code) {
       return RxUtils.defer(new RxUtils.DefFunc<VoucherRedemptionsResponse>() {
+
         @Override
         public VoucherRedemptionsResponse method() {
           return RedemptionsModule.this.getForVoucher(code);
@@ -126,6 +130,7 @@ public final class RedemptionsModule extends AbsModule<ExtAsync, ExtRxJava> {
 
     public Observable<RollbackRedemptionResponse> rollback(final String redemptionId, final String reason, final RollbackRedemption rollbackRedemption) {
       return RxUtils.defer(new RxUtils.DefFunc<RollbackRedemptionResponse>() {
+
         @Override
         public RollbackRedemptionResponse method() {
           return RedemptionsModule.this.rollback(redemptionId, reason, rollbackRedemption);

@@ -1,5 +1,6 @@
 package io.voucherify.client.module;
 
+import io.reactivex.Observable;
 import io.voucherify.client.api.VoucherifyApi;
 import io.voucherify.client.callback.VoucherifyCallback;
 import io.voucherify.client.model.campaign.AddVoucherToCampaign;
@@ -12,8 +13,8 @@ import io.voucherify.client.model.campaign.response.CampaignResponse;
 import io.voucherify.client.model.campaign.response.CampaignsResponse;
 import io.voucherify.client.module.CampaignsModule.ExtAsync;
 import io.voucherify.client.module.CampaignsModule.ExtRxJava;
+import io.voucherify.client.utils.response.EmptyResponse;
 import io.voucherify.client.utils.RxUtils;
-import rx.Observable;
 
 import java.util.concurrent.Executor;
 
@@ -85,11 +86,11 @@ public final class CampaignsModule extends AbsModule<ExtAsync, ExtRxJava> {
       RxUtils.subscribe(executor, rx().addVoucherWithCode(campaignName, code, addVoucherToCampaign), callback);
     }
 
-    public void delete(String campaignName, DeleteCampaignParams deleteCampaignParams, VoucherifyCallback<Void> callback) {
+    public void delete(String campaignName, DeleteCampaignParams deleteCampaignParams, VoucherifyCallback<EmptyResponse> callback) {
       RxUtils.subscribe(executor, rx().delete(campaignName, deleteCampaignParams), callback);
     }
 
-    public void importVouchers(String campaignName, CampaignImportVouchers importVouchers, VoucherifyCallback<Void> callback) {
+    public void importVouchers(String campaignName, CampaignImportVouchers importVouchers, VoucherifyCallback<EmptyResponse> callback) {
       RxUtils.subscribe(executor, rx().importVouchers(campaignName, importVouchers), callback);
     }
   }
@@ -98,6 +99,7 @@ public final class CampaignsModule extends AbsModule<ExtAsync, ExtRxJava> {
 
     public Observable<CampaignResponse> create(final CreateCampaign createCampaign) {
       return RxUtils.defer(new RxUtils.DefFunc<CampaignResponse>() {
+
         @Override
         public CampaignResponse method() {
           return CampaignsModule.this.create(createCampaign);
@@ -107,6 +109,7 @@ public final class CampaignsModule extends AbsModule<ExtAsync, ExtRxJava> {
 
     public Observable<AddVoucherToCampaignResponse> addVoucher(final String campaignName, final AddVoucherToCampaign addVoucherToCampaign) {
       return RxUtils.defer(new RxUtils.DefFunc<AddVoucherToCampaignResponse>() {
+
         @Override
         public AddVoucherToCampaignResponse method() {
           return CampaignsModule.this.addVoucher(campaignName, addVoucherToCampaign);
@@ -116,6 +119,7 @@ public final class CampaignsModule extends AbsModule<ExtAsync, ExtRxJava> {
 
     public Observable<AddVoucherToCampaignResponse> addVoucherWithCode(final String campaignName, final String code, final AddVoucherToCampaign addVoucherToCampaign) {
       return RxUtils.defer(new RxUtils.DefFunc<AddVoucherToCampaignResponse>() {
+
         @Override
         public AddVoucherToCampaignResponse method() {
           return CampaignsModule.this.addVoucherWithCode(campaignName, code, addVoucherToCampaign);
@@ -123,28 +127,31 @@ public final class CampaignsModule extends AbsModule<ExtAsync, ExtRxJava> {
       });
     }
 
-    public Observable<Void> delete(final String campaignName, final DeleteCampaignParams deleteCampaignParams) {
-      return RxUtils.defer(new RxUtils.DefFunc<Void>() {
+    public Observable<EmptyResponse> delete(final String campaignName, final DeleteCampaignParams deleteCampaignParams) {
+      return RxUtils.defer(new RxUtils.DefFunc<EmptyResponse>() {
+
         @Override
-        public Void method() {
+        public EmptyResponse method() {
           CampaignsModule.this.delete(campaignName, deleteCampaignParams);
-          return null;
+          return EmptyResponse.create();
         }
       });
     }
 
-    public Observable<Void> importVouchers(final String campaignName, final CampaignImportVouchers importVouchers) {
-      return RxUtils.defer(new RxUtils.DefFunc<Void>() {
+    public Observable<EmptyResponse> importVouchers(final String campaignName, final CampaignImportVouchers importVouchers) {
+      return RxUtils.defer(new RxUtils.DefFunc<EmptyResponse>() {
+
         @Override
-        public Void method() {
+        public EmptyResponse method() {
           CampaignsModule.this.importVouchers(campaignName, importVouchers);
-          return null;
+          return EmptyResponse.create();
         }
       });
     }
 
     public Observable<CampaignsResponse> list(final CampaignsFilter campaignsFilter) {
       return RxUtils.defer(new RxUtils.DefFunc<CampaignsResponse>() {
+
         @Override
         public CampaignsResponse method() {
           return CampaignsModule.this.list(campaignsFilter);
@@ -154,6 +161,7 @@ public final class CampaignsModule extends AbsModule<ExtAsync, ExtRxJava> {
 
     public Observable<CampaignResponse> get(final String name) {
       return RxUtils.defer(new RxUtils.DefFunc<CampaignResponse>() {
+
         @Override
         public CampaignResponse method() {
           return CampaignsModule.this.get(name);

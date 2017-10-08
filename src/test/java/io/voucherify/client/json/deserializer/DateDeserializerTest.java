@@ -4,7 +4,6 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import io.voucherify.client.Constants;
 import io.voucherify.client.error.VoucherifyError;
-import io.voucherify.client.json.deserializer.DateDeserializer;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;

@@ -11,7 +11,6 @@ import lombok.ToString;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Getter
 @ToString
-
 class CustomerRedemptionSummary {
 
   @JsonProperty("total_redemeed")

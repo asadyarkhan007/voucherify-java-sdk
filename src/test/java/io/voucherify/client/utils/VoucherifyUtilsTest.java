@@ -1,12 +1,12 @@
 package io.voucherify.client.utils;
 
-import io.voucherify.client.model.voucher.Gift;
-import org.assertj.core.api.Assertions;
-import org.junit.Test;
 import io.voucherify.client.VoucherifyUtils;
 import io.voucherify.client.model.voucher.Discount;
 import io.voucherify.client.model.voucher.DiscountType;
+import io.voucherify.client.model.voucher.Gift;
 import io.voucherify.client.model.voucher.Voucher;
+import org.assertj.core.api.Assertions;
+import org.junit.Test;
 
 import java.math.BigDecimal;
 

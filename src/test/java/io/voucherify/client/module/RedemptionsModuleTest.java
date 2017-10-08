@@ -1,6 +1,6 @@
 package io.voucherify.client.module;
 
-import com.squareup.okhttp.mockwebserver.RecordedRequest;
+import io.reactivex.Observable;
 import io.voucherify.client.callback.VoucherifyCallback;
 import io.voucherify.client.model.customer.Customer;
 import io.voucherify.client.model.order.Order;
@@ -14,8 +14,8 @@ import io.voucherify.client.model.redemption.response.RedemptionEntryResponse;
 import io.voucherify.client.model.redemption.response.RedemptionsResponse;
 import io.voucherify.client.model.redemption.response.RollbackRedemptionResponse;
 import io.voucherify.client.model.redemption.response.VoucherRedemptionsResponse;
+import okhttp3.mockwebserver.RecordedRequest;
 import org.junit.Test;
-import rx.Observable;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -27,20 +27,20 @@ public class RedemptionsModuleTest extends AbstractModuleTest {
   public void shouldRedeemVoucher() {
     // given
     Customer customer = Customer.builder().email("some email")
-            .description("some description")
-            .metadataEntry("locale", "en-GB")
-            .build();
+        .description("some description")
+        .metadataEntry("locale", "en-GB")
+        .build();
 
     Order order = Order.builder()
-            .item(OrderItem.builder().productId("productId").quantity(10).skuId("skuId").build())
-            .item(OrderItem.builder().productId("productId2").quantity(20).skuId("skuId2").build())
-            .amount(25000)
-            .build();
+        .item(OrderItem.builder().productId("productId").quantity(10).skuId("skuId").build())
+        .item(OrderItem.builder().productId("productId2").quantity(20).skuId("skuId2").build())
+        .amount(25000)
+        .build();
 
     RedeemVoucher redeemVoucher = RedeemVoucher.builder()
-            .customer(customer)
-            .order(order)
-            .build();
+        .customer(customer)
+        .order(order)
+        .build();
 
     enqueueResponse(redeemVoucher);
 
@@ -72,12 +72,12 @@ public class RedemptionsModuleTest extends AbstractModuleTest {
   @Test
   public void shouldListRedemptions() {
     RedemptionsFilter redemptionsFilter = RedemptionsFilter.builder()
-            .customer("customer")
-            .campaign("campaign")
-            .limit(10)
-            .page(5)
-            .result(RedemptionStatus.SUCCESS)
-            .build();
+        .customer("customer")
+        .campaign("campaign")
+        .limit(10)
+        .page(5)
+        .result(RedemptionStatus.SUCCESS)
+        .build();
 
     enqueueResponse("{}");
 
@@ -110,13 +110,13 @@ public class RedemptionsModuleTest extends AbstractModuleTest {
   public void shouldRollbackRedemption() {
     // given
     Customer customer = Customer.builder().email("some email")
-            .description("some description")
-            .metadataEntry("locale", "en-GB")
-            .build();
+        .description("some description")
+        .metadataEntry("locale", "en-GB")
+        .build();
 
     RollbackRedemption rollbackRedemption = RollbackRedemption.builder()
-            .customer(customer)
-            .build();
+        .customer(customer)
+        .build();
 
     enqueueResponse("{}");
 
@@ -134,20 +134,20 @@ public class RedemptionsModuleTest extends AbstractModuleTest {
   public void shouldRedeemVoucherAsync() {
     // given
     Customer customer = Customer.builder().email("some email")
-            .description("some description")
-            .metadataEntry("locale", "en-GB")
-            .build();
+        .description("some description")
+        .metadataEntry("locale", "en-GB")
+        .build();
 
     Order order = Order.builder()
-            .item(OrderItem.builder().productId("productId").quantity(10).skuId("skuId").build())
-            .item(OrderItem.builder().productId("productId2").quantity(20).skuId("skuId2").build())
-            .amount(25000)
-            .build();
+        .item(OrderItem.builder().productId("productId").quantity(10).skuId("skuId").build())
+        .item(OrderItem.builder().productId("productId2").quantity(20).skuId("skuId2").build())
+        .amount(25000)
+        .build();
 
     RedeemVoucher redeemVoucher = RedeemVoucher.builder()
-            .customer(customer)
-            .order(order)
-            .build();
+        .customer(customer)
+        .order(order)
+        .build();
 
     enqueueResponse(redeemVoucher);
 
@@ -182,12 +182,12 @@ public class RedemptionsModuleTest extends AbstractModuleTest {
   @Test
   public void shouldListRedemptionsAsync() {
     RedemptionsFilter redemptionsFilter = RedemptionsFilter.builder()
-            .customer("customer")
-            .campaign("campaign")
-            .limit(10)
-            .page(5)
-            .result(RedemptionStatus.SUCCESS)
-            .build();
+        .customer("customer")
+        .campaign("campaign")
+        .limit(10)
+        .page(5)
+        .result(RedemptionStatus.SUCCESS)
+        .build();
 
     enqueueResponse("{}");
 
@@ -223,13 +223,13 @@ public class RedemptionsModuleTest extends AbstractModuleTest {
   public void shouldRollbackRedemptionAsync() {
     // given
     Customer customer = Customer.builder().email("some email")
-            .description("some description")
-            .metadataEntry("locale", "en-GB")
-            .build();
+        .description("some description")
+        .metadataEntry("locale", "en-GB")
+        .build();
 
     RollbackRedemption rollbackRedemption = RollbackRedemption.builder()
-            .customer(customer)
-            .build();
+        .customer(customer)
+        .build();
 
     enqueueResponse("{}");
 
@@ -249,20 +249,20 @@ public class RedemptionsModuleTest extends AbstractModuleTest {
   public void shouldRedeemVoucherRxJava() {
     // given
     Customer customer = Customer.builder().email("some email")
-            .description("some description")
-            .metadataEntry("locale", "en-GB")
-            .build();
+        .description("some description")
+        .metadataEntry("locale", "en-GB")
+        .build();
 
     Order order = Order.builder()
-            .item(OrderItem.builder().productId("productId").quantity(10).skuId("skuId").build())
-            .item(OrderItem.builder().productId("productId2").quantity(20).skuId("skuId2").build())
-            .amount(25000)
-            .build();
+        .item(OrderItem.builder().productId("productId").quantity(10).skuId("skuId").build())
+        .item(OrderItem.builder().productId("productId2").quantity(20).skuId("skuId2").build())
+        .amount(25000)
+        .build();
 
     RedeemVoucher redeemVoucher = RedeemVoucher.builder()
-            .customer(customer)
-            .order(order)
-            .build();
+        .customer(customer)
+        .order(order)
+        .build();
 
     enqueueResponse(redeemVoucher);
 
@@ -270,7 +270,7 @@ public class RedemptionsModuleTest extends AbstractModuleTest {
     Observable<RedeemVoucherResponse> observable = client.redemptions().rx().redeem("some code", redeemVoucher);
 
     // then
-    RedeemVoucherResponse result = observable.toBlocking().first();
+    RedeemVoucherResponse result = observable.blockingFirst();
     assertThat(result).isNotNull();
     RecordedRequest request = getRequest();
     assertThat(request.getPath()).isEqualTo("/vouchers/some%20code/redemption");
@@ -286,7 +286,7 @@ public class RedemptionsModuleTest extends AbstractModuleTest {
     Observable<RedemptionEntryResponse> observable = client.redemptions().rx().get("some id");
 
     // then
-    RedemptionEntryResponse result = observable.toBlocking().first();
+    RedemptionEntryResponse result = observable.blockingFirst();
     assertThat(result).isNotNull();
     RecordedRequest request = getRequest();
     assertThat(request.getPath()).isEqualTo("/redemptions/some%20id");
@@ -296,12 +296,12 @@ public class RedemptionsModuleTest extends AbstractModuleTest {
   @Test
   public void shouldListRedemptionsRxJava() {
     RedemptionsFilter redemptionsFilter = RedemptionsFilter.builder()
-            .customer("customer")
-            .campaign("campaign")
-            .limit(10)
-            .page(5)
-            .result(RedemptionStatus.SUCCESS)
-            .build();
+        .customer("customer")
+        .campaign("campaign")
+        .limit(10)
+        .page(5)
+        .result(RedemptionStatus.SUCCESS)
+        .build();
 
     enqueueResponse("{}");
 
@@ -309,7 +309,7 @@ public class RedemptionsModuleTest extends AbstractModuleTest {
     Observable<RedemptionsResponse> observable = client.redemptions().rx().list(redemptionsFilter);
 
     // then
-    RedemptionsResponse list = observable.toBlocking().first();
+    RedemptionsResponse list = observable.blockingFirst();
     assertThat(list).isNotNull();
     RecordedRequest request = getRequest();
     assertThat(request.getPath()).isEqualTo("/redemptions?result=SUCCESS&limit=10&campaign=campaign&page=5&customer=customer");
@@ -325,7 +325,7 @@ public class RedemptionsModuleTest extends AbstractModuleTest {
     Observable<VoucherRedemptionsResponse> observable = client.redemptions().rx().getForVoucher("some code");
 
     // then
-    VoucherRedemptionsResponse result = observable.toBlocking().first();
+    VoucherRedemptionsResponse result = observable.blockingFirst();
     assertThat(result).isNotNull();
     RecordedRequest request = getRequest();
     assertThat(request.getPath()).isEqualTo("/vouchers/some%20code/redemption");
@@ -336,13 +336,13 @@ public class RedemptionsModuleTest extends AbstractModuleTest {
   public void shouldRollbackRedemptionRxJava() {
     // given
     Customer customer = Customer.builder().email("some email")
-            .description("some description")
-            .metadataEntry("locale", "en-GB")
-            .build();
+        .description("some description")
+        .metadataEntry("locale", "en-GB")
+        .build();
 
     RollbackRedemption rollbackRedemption = RollbackRedemption.builder()
-            .customer(customer)
-            .build();
+        .customer(customer)
+        .build();
 
     enqueueResponse("{}");
 
@@ -350,7 +350,7 @@ public class RedemptionsModuleTest extends AbstractModuleTest {
     Observable<RollbackRedemptionResponse> observable = client.redemptions().rx().rollback("some code", "reason", rollbackRedemption);
 
     // then
-    RollbackRedemptionResponse result = observable.toBlocking().first();
+    RollbackRedemptionResponse result = observable.blockingFirst();
     assertThat(result).isNotNull();
     RecordedRequest request = getRequest();
     assertThat(request.getPath()).isEqualTo("/redemptions/some%20code/rollback?reason=reason");

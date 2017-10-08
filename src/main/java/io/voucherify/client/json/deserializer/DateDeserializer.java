@@ -15,7 +15,7 @@ import java.util.List;
 
 public class DateDeserializer extends JsonDeserializer<Date> {
 
-  private final List<DateFormat> dateFormats = new ArrayList<DateFormat>();
+  private final List<DateFormat> dateFormats = new ArrayList<>();
 
   public DateDeserializer(String... dateFormats) {
     for (String df : dateFormats) {

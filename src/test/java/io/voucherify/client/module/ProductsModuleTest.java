@@ -1,18 +1,19 @@
 package io.voucherify.client.module;
 
-import com.squareup.okhttp.mockwebserver.RecordedRequest;
+import io.reactivex.Observable;
+import io.voucherify.client.callback.VoucherifyCallback;
+import io.voucherify.client.model.product.DeleteProductParams;
+import io.voucherify.client.model.product.DeleteSKUParams;
 import io.voucherify.client.model.product.Product;
 import io.voucherify.client.model.product.ProductsFilter;
 import io.voucherify.client.model.product.SKU;
 import io.voucherify.client.model.product.response.ProductResponse;
 import io.voucherify.client.model.product.response.ProductsResponse;
-import io.voucherify.client.model.product.response.SKUsResponse;
-import org.junit.Test;
-import io.voucherify.client.callback.VoucherifyCallback;
-import io.voucherify.client.model.product.DeleteProductParams;
-import io.voucherify.client.model.product.DeleteSKUParams;
 import io.voucherify.client.model.product.response.SKUResponse;
-import rx.Observable;
+import io.voucherify.client.model.product.response.SKUsResponse;
+import io.voucherify.client.utils.response.EmptyResponse;
+import okhttp3.mockwebserver.RecordedRequest;
+import org.junit.Test;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -362,7 +363,7 @@ public class ProductsModuleTest extends AbstractModuleTest {
     Observable<ProductResponse> observable = client.products().rx().create(product);
 
     // then
-    ProductResponse result = observable.toBlocking().first();
+    ProductResponse result = observable.blockingFirst();
     assertThat(result).isNotNull();
     assertThat(result.getName()).isEqualTo("some-name");
     RecordedRequest request = getRequest();
@@ -379,7 +380,7 @@ public class ProductsModuleTest extends AbstractModuleTest {
     Observable<ProductResponse> observable = client.products().rx().get("some-id");
 
     // then
-    ProductResponse result = observable.toBlocking().first();
+    ProductResponse result = observable.blockingFirst();
     assertThat(result).isNotNull();
     assertThat(result.getId()).isEqualTo("some-id");
     RecordedRequest request = getRequest();
@@ -398,7 +399,7 @@ public class ProductsModuleTest extends AbstractModuleTest {
     Observable<ProductResponse> observable = client.products().rx().update(product);
 
     // then
-    ProductResponse result = observable.toBlocking().first();
+    ProductResponse result = observable.blockingFirst();
     assertThat(result).isNotNull();
     assertThat(result.getId()).isEqualTo("some-id");
     RecordedRequest request = getRequest();
@@ -415,7 +416,7 @@ public class ProductsModuleTest extends AbstractModuleTest {
     Observable<ProductsResponse> observable = client.products().rx().list(ProductsFilter.builder().limit(10).page(1).build());
 
     // then
-    ProductsResponse result = observable.toBlocking().first();
+    ProductsResponse result = observable.blockingFirst();
     assertThat(result).isNotNull();
     assertThat(result.getProducts()).isEmpty();
     RecordedRequest request = getRequest();
@@ -429,10 +430,10 @@ public class ProductsModuleTest extends AbstractModuleTest {
     enqueueEmptyResponse();
 
     // when
-    Observable<Void> observable = client.products().rx().delete("some-id", DeleteProductParams.builder().force(true).build());
+    Observable<EmptyResponse> observable = client.products().rx().delete("some-id", DeleteProductParams.builder().force(true).build());
 
     // then
-    observable.toBlocking().first();
+    observable.blockingFirst();
     RecordedRequest request = getRequest();
     assertThat(request.getPath()).isEqualTo("/products/some-id?force=true");
     assertThat(request.getMethod()).isEqualTo("DELETE");
@@ -449,7 +450,7 @@ public class ProductsModuleTest extends AbstractModuleTest {
     Observable<SKUResponse> observable = client.products().rx().createSKU("productId", sku);
 
     // then
-    SKUResponse result = observable.toBlocking().first();
+    SKUResponse result = observable.blockingFirst();
     assertThat(result).isNotNull();
     assertThat(result.getSku()).isEqualTo("sku");
     RecordedRequest request = getRequest();
@@ -466,7 +467,7 @@ public class ProductsModuleTest extends AbstractModuleTest {
     Observable<SKUResponse> observable = client.products().rx().getSKU("productId", "skuId");
 
     // then
-    SKUResponse result = observable.toBlocking().first();
+    SKUResponse result = observable.blockingFirst();
     assertThat(result).isNotNull();
     assertThat(result.getId()).isEqualTo("skuId");
     RecordedRequest request = getRequest();
@@ -485,7 +486,7 @@ public class ProductsModuleTest extends AbstractModuleTest {
     Observable<SKUResponse> observable = client.products().rx().updateSKU("productId", sku);
 
     // then
-    SKUResponse result = observable.toBlocking().first();
+    SKUResponse result = observable.blockingFirst();
     assertThat(result).isNotNull();
     assertThat(result.getId()).isEqualTo("skuId");
     RecordedRequest request = getRequest();
@@ -502,7 +503,7 @@ public class ProductsModuleTest extends AbstractModuleTest {
     Observable<SKUsResponse> observable = client.products().rx().listSKU("productId");
 
     // then
-    SKUsResponse result = observable.toBlocking().first();
+    SKUsResponse result = observable.blockingFirst();
     assertThat(result).isNotNull();
     assertThat(result.getSkus()).isEmpty();
     RecordedRequest request = getRequest();
@@ -516,10 +517,10 @@ public class ProductsModuleTest extends AbstractModuleTest {
     enqueueEmptyResponse();
 
     // when
-    Observable<Void> observable = client.products().rx().deleteSKU("productId", "skuId", DeleteSKUParams.builder().force(true).build());
+    Observable<EmptyResponse> observable = client.products().rx().deleteSKU("productId", "skuId", DeleteSKUParams.builder().force(true).build());
 
     // then
-    observable.toBlocking().first();
+    observable.blockingFirst();
     RecordedRequest request = getRequest();
     assertThat(request.getPath()).isEqualTo("/products/productId/skus/skuId?force=true");
     assertThat(request.getMethod()).isEqualTo("DELETE");

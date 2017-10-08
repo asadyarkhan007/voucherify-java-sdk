@@ -1,5 +1,6 @@
 package io.voucherify.client.module;
 
+import io.reactivex.Observable;
 import io.voucherify.client.api.VoucherifyApi;
 import io.voucherify.client.callback.VoucherifyCallback;
 import io.voucherify.client.model.customer.Customer;
@@ -7,7 +8,7 @@ import io.voucherify.client.model.customer.response.CustomerResponse;
 import io.voucherify.client.module.CustomersModule.ExtAsync;
 import io.voucherify.client.module.CustomersModule.ExtRxJava;
 import io.voucherify.client.utils.RxUtils;
-import rx.Observable;
+import io.voucherify.client.utils.response.EmptyResponse;
 
 import java.util.concurrent.Executor;
 
@@ -67,7 +68,7 @@ public final class CustomersModule extends AbsModule<ExtAsync, ExtRxJava> {
       RxUtils.subscribe(executor, rx().update(customer), callback);
     }
 
-    public void delete(String customerId, VoucherifyCallback<Void> callback) {
+    public void delete(String customerId, VoucherifyCallback<EmptyResponse> callback) {
       RxUtils.subscribe(executor, rx().delete(customerId), callback);
     }
   }
@@ -76,6 +77,7 @@ public final class CustomersModule extends AbsModule<ExtAsync, ExtRxJava> {
 
     public Observable<CustomerResponse> get(final String customerId) {
       return RxUtils.defer(new RxUtils.DefFunc<CustomerResponse>() {
+
         @Override
         public CustomerResponse method() {
           return CustomersModule.this.get(customerId);
@@ -85,6 +87,7 @@ public final class CustomersModule extends AbsModule<ExtAsync, ExtRxJava> {
 
     public Observable<CustomerResponse> create(final Customer customer) {
       return RxUtils.defer(new RxUtils.DefFunc<CustomerResponse>() {
+
         @Override
         public CustomerResponse method() {
           return CustomersModule.this.create(customer);
@@ -94,6 +97,7 @@ public final class CustomersModule extends AbsModule<ExtAsync, ExtRxJava> {
 
     public Observable<CustomerResponse> update(final Customer customer) {
       return RxUtils.defer(new RxUtils.DefFunc<CustomerResponse>() {
+
         @Override
         public CustomerResponse method() {
           return CustomersModule.this.update(customer);
@@ -101,12 +105,13 @@ public final class CustomersModule extends AbsModule<ExtAsync, ExtRxJava> {
       });
     }
 
-    public Observable<Void> delete(final String customerId) {
-      return RxUtils.defer(new RxUtils.DefFunc<Void>() {
+    public Observable<EmptyResponse> delete(final String customerId) {
+      return RxUtils.defer(new RxUtils.DefFunc<EmptyResponse>() {
+
         @Override
-        public Void method() {
+        public EmptyResponse method() {
           CustomersModule.this.delete(customerId);
-          return null;
+          return EmptyResponse.create();
         }
       });
     }

@@ -1,6 +1,6 @@
 package io.voucherify.client.module;
 
-import com.squareup.okhttp.mockwebserver.RecordedRequest;
+import io.reactivex.Observable;
 import io.voucherify.client.callback.VoucherifyCallback;
 import io.voucherify.client.model.customer.Customer;
 import io.voucherify.client.model.distribution.CreateExport;
@@ -8,8 +8,9 @@ import io.voucherify.client.model.distribution.PublishVoucher;
 import io.voucherify.client.model.distribution.response.ExportResponse;
 import io.voucherify.client.model.distribution.response.ExportStatus;
 import io.voucherify.client.model.distribution.response.PublishVoucherResponse;
+import io.voucherify.client.utils.response.EmptyResponse;
+import okhttp3.mockwebserver.RecordedRequest;
 import org.junit.Test;
-import rx.Observable;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -18,14 +19,14 @@ import static org.awaitility.Awaitility.await;
 public class DistributionsModuleTest extends AbstractModuleTest {
 
   private static final PublishVoucher PUBLISH_VOUCHER = PublishVoucher.builder()
-          .voucher("some-voucher")
-          .campaign("some-campaign")
-          .customer(Customer
-                  .builder()
-                  .email("some-email")
-                  .build())
-          .channel("some-channel")
-          .build();
+      .voucher("some-voucher")
+      .campaign("some-campaign")
+      .customer(Customer
+          .builder()
+          .email("some-email")
+          .build())
+      .channel("some-channel")
+      .build();
 
   @Test
   public void shouldPublishVoucher() {
@@ -165,7 +166,7 @@ public class DistributionsModuleTest extends AbstractModuleTest {
     Observable<PublishVoucherResponse> observable = client.distributions().rx().publish(PUBLISH_VOUCHER);
 
     // then
-    PublishVoucherResponse result = observable.toBlocking().first();
+    PublishVoucherResponse result = observable.blockingFirst();
     assertThat(result).isNotNull();
     RecordedRequest request = getRequest();
     assertThat(request.getPath()).isEqualTo("/vouchers/publish");
@@ -182,7 +183,7 @@ public class DistributionsModuleTest extends AbstractModuleTest {
     Observable<ExportResponse> observable = client.distributions().rx().createExport(createExport);
 
     // then
-    ExportResponse result = observable.toBlocking().first();
+    ExportResponse result = observable.blockingFirst();
     assertThat(result).isNotNull();
     assertThat(result.getStatus()).isEqualTo(ExportStatus.IN_PROGRESS);
     RecordedRequest request = getRequest();
@@ -199,7 +200,7 @@ public class DistributionsModuleTest extends AbstractModuleTest {
     Observable<ExportResponse> observable = client.distributions().rx().getExport("some-id");
 
     // then
-    ExportResponse result = observable.toBlocking().first();
+    ExportResponse result = observable.blockingFirst();
     assertThat(result).isNotNull();
     assertThat(result.getStatus()).isEqualTo(ExportStatus.IN_PROGRESS);
     assertThat(result.getId()).isEqualTo("1");
@@ -214,10 +215,10 @@ public class DistributionsModuleTest extends AbstractModuleTest {
     enqueueEmptyResponse();
 
     // when
-    Observable<Void> observable = client.distributions().rx().deleteExport("some-id");
+    Observable<EmptyResponse> observable = client.distributions().rx().deleteExport("some-id");
 
     // then
-    observable.toBlocking().first();
+    observable.blockingFirst();
     RecordedRequest request = getRequest();
     assertThat(request.getPath()).isEqualTo("/exports/some-id");
     assertThat(request.getMethod()).isEqualTo("DELETE");
