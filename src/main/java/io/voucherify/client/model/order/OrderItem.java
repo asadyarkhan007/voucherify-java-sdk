@@ -24,5 +24,4 @@ public class OrderItem {
   private Integer quantity;
 
   private Integer price;
-
 }

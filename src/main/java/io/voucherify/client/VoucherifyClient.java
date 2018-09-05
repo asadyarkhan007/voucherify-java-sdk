@@ -7,7 +7,6 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import io.voucherify.client.api.VoucherifyApi;
 import io.voucherify.client.error.VoucherifyErrorHandler;
-import io.voucherify.client.json.converter.JsonConverter;
 import io.voucherify.client.json.deserializer.CampaignsResponseDeserializer;
 import io.voucherify.client.json.deserializer.DateDeserializer;
 import io.voucherify.client.json.deserializer.VouchersResponseDeserializer;
@@ -27,44 +26,39 @@ import io.voucherify.client.module.ValidationRulesModule;
 import io.voucherify.client.module.ValidationsModule;
 import io.voucherify.client.module.VoucherModule;
 import io.voucherify.client.utils.Platform;
-import retrofit.RequestInterceptor;
-import retrofit.RestAdapter;
-import retrofit.client.Client;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
+import okhttp3.logging.HttpLoggingInterceptor;
+import org.apache.commons.lang3.ObjectUtils;
+import org.apache.commons.lang3.StringUtils;
+import retrofit2.Retrofit;
+import retrofit2.converter.jackson.JacksonConverterFactory;
 
 import java.util.Date;
 import java.util.concurrent.Executor;
+import java.util.concurrent.TimeUnit;
 
 public class VoucherifyClient {
 
   private final String httpScheme;
-
-  private VoucherModule voucherModule;
-
-  private ValidationsModule validationsModule;
-
-  private CustomersModule customersModule;
-
-  private CampaignsModule campaignsModule;
-
-  private RedemptionsModule redemptionsModule;
-
-  private DistributionsModule distributionsModule;
-
-  private ProductsModule productsModule;
-
-  private SegmentsModule segmentsModule;
-
-  private ValidationRulesModule validationRulesModule;
-
-  private PromotionsModule promotionsModule;
-
   private final OrdersModule ordersModule;
-
   private final EventsModule eventsModule;
-
+  private VoucherModule voucherModule;
+  private ValidationsModule validationsModule;
+  private CustomersModule customersModule;
+  private CampaignsModule campaignsModule;
+  private RedemptionsModule redemptionsModule;
+  private DistributionsModule distributionsModule;
+  private ProductsModule productsModule;
+  private SegmentsModule segmentsModule;
+  private ValidationRulesModule validationRulesModule;
+  private PromotionsModule promotionsModule;
   private VoucherifyApi voucherifyApi;
 
   private Executor executor;
+
+  private VoucherifyErrorHandler errorHandler;
 
   private VoucherifyClient(Builder builder) {
     if (builder.clientSecretKey == null) {
@@ -77,6 +71,7 @@ public class VoucherifyClient {
 
     this.httpScheme = createHttpScheme(builder);
     this.executor = createCallbackExecutor();
+    this.errorHandler = new VoucherifyErrorHandler();
 
     this.voucherifyApi = createRetrofitService(builder);
 
@@ -146,7 +141,7 @@ public class VoucherifyClient {
     return Platform.get().callbackExecutor();
   }
 
-  private JsonConverter createConverter(Builder builder) {
+  private JacksonConverterFactory createConverter(Builder builder) {
     ObjectMapper mapper = new ObjectMapper();
     mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
     mapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
@@ -154,11 +149,17 @@ public class VoucherifyClient {
 
     SimpleModule jsonParsingModule = new SimpleModule();
     jsonParsingModule.addSerializer(Date.class, new DateSerializer(Constants.ENDPOINT_DATE_FORMAT));
-    jsonParsingModule.addDeserializer(Date.class, new DateDeserializer(Constants.ENDPOINT_DATE_FORMAT, Constants.ENDPOINT_SECONDARY_DATE_FORMAT));
-    jsonParsingModule.addDeserializer(CampaignsResponse.class, new CampaignsResponseDeserializer(builder.apiVersion));
-    jsonParsingModule.addDeserializer(VouchersResponse.class, new VouchersResponseDeserializer(builder.apiVersion));
+    jsonParsingModule.addDeserializer(
+        Date.class,
+        new DateDeserializer(
+            Constants.ENDPOINT_DATE_FORMAT, Constants.ENDPOINT_SECONDARY_DATE_FORMAT));
+    jsonParsingModule.addDeserializer(
+        CampaignsResponse.class, new CampaignsResponseDeserializer(builder.apiVersion));
+    jsonParsingModule.addDeserializer(
+        VouchersResponse.class, new VouchersResponseDeserializer(builder.apiVersion));
     mapper.registerModule(jsonParsingModule);
-    return new JsonConverter(mapper);
+
+    return JacksonConverterFactory.create(mapper);
   }
 
   private String createHttpScheme(Builder builder) {
@@ -170,62 +171,72 @@ public class VoucherifyClient {
   }
 
   private VoucherifyApi createRetrofitService(Builder builder) {
-    RestAdapter.Builder restBuilder = new RestAdapter.Builder()
-        .setConverter(createConverter(builder))
-        .setRequestInterceptor(createInterceptor(builder));
-
-    setEndPoint(builder, restBuilder);
-    setClientProvider(builder, restBuilder);
-    setLogLevel(builder, restBuilder);
-    setErrorHandler(restBuilder);
+    Retrofit.Builder restBuilder =
+        new Retrofit.Builder()
+            .addConverterFactory(createConverter(builder))
+            .baseUrl(getBaseUrl(builder))
+            .client(createClient(builder));
 
     return restBuilder.build().create(VoucherifyApi.class);
   }
 
-  private RequestInterceptor createInterceptor(final Builder builder) {
-    return new RequestInterceptor() {
+  private OkHttpClient createClient(Builder builder) {
+    OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
+    httpClient
+        .addInterceptor(
+            chain -> {
+              Request original = chain.request();
 
-      @Override
-      public void intercept(RequestFacade request) {
-        request.addHeader(Constants.HTTP_HEADER_VOUCHERIFY_CHANNEL, Constants.VOUCHERIFY_CHANNEL_NAME);
-        request.addHeader(Constants.HTTP_HEADER_APP_ID, builder.appId);
-        request.addHeader(Constants.HTTP_HEADER_APP_TOKEN, builder.clientSecretKey);
+              Request request =
+                  original
+                      .newBuilder()
+                      .header(
+                          Constants.HTTP_HEADER_VOUCHERIFY_CHANNEL,
+                          Constants.VOUCHERIFY_CHANNEL_NAME)
+                      .header(Constants.HTTP_HEADER_APP_ID, builder.appId)
+                      .header(Constants.HTTP_HEADER_APP_TOKEN, builder.clientSecretKey)
+                      .header(
+                          Constants.HTTP_HEADER_VOUCHERIFY_API_VERSION,
+                          builder.apiVersion.getValue())
+                      .method(original.method(), original.body())
+                      .build();
 
-        if (builder.apiVersion != null) {
-          request.addHeader(Constants.HTTP_HEADER_VOUCHERIFY_API_VERSION, builder.apiVersion.getValue());
-        } else {
-          request.addHeader(Constants.HTTP_HEADER_VOUCHERIFY_API_VERSION, ApiVersion.V_2017_04_20.getValue());
-        }
-      }
-    };
+              return chain.proceed(request);
+            })
+        .addInterceptor(
+            chain -> {
+              Request request = chain.request();
+              Response response = chain.proceed(request);
+
+              if (!response.isSuccessful()) {
+                throw errorHandler.from(response);
+              }
+
+              return response;
+            });
+
+    httpClient.connectTimeout(
+        ObjectUtils.firstNonNull(builder.connectionTimeout, Constants.CONNECTION_TIMEOUT),
+        TimeUnit.SECONDS);
+    httpClient.readTimeout(
+        ObjectUtils.firstNonNull(builder.readTimeout, Constants.CONNECTION_TIMEOUT),
+        TimeUnit.SECONDS);
+    httpClient.writeTimeout(
+        ObjectUtils.firstNonNull(builder.writeTimeout, Constants.CONNECTION_TIMEOUT),
+        TimeUnit.SECONDS);
+
+    HttpLoggingInterceptor httpLoggingInterceptor = new HttpLoggingInterceptor();
+    httpLoggingInterceptor.setLevel(
+        ObjectUtils.firstNonNull(builder.logLevel, LogLevel.NONE).getValue());
+    httpClient.addInterceptor(httpLoggingInterceptor);
+
+    return httpClient.build();
   }
 
-  private void setLogLevel(Builder builder, RestAdapter.Builder restBuilder) {
-    if (builder.logLevel != null) {
-      restBuilder.setLogLevel(builder.logLevel);
-    }
-  }
-
-  private void setClientProvider(Builder builder, RestAdapter.Builder restBuilder) {
-    if (builder.clientProvider != null) {
-      restBuilder.setClient(builder.clientProvider);
-    }
-  }
-
-  private void setEndPoint(Builder builder, RestAdapter.Builder restBuilder) {
-    String endpoint;
-
-    if (builder.endpoint == null) {
-      endpoint = Constants.ENDPOINT_VOUCHERIFY;
-    } else {
-      endpoint = builder.endpoint;
-    }
-
-    restBuilder.setEndpoint(String.format("%s://%s", httpScheme, endpoint));
-  }
-
-  private void setErrorHandler(RestAdapter.Builder restBuilder) {
-    restBuilder.setErrorHandler(new VoucherifyErrorHandler());
+  private String getBaseUrl(Builder builder) {
+    String endpoint = ObjectUtils.firstNonNull(builder.endpoint, Constants.ENDPOINT_VOUCHERIFY);
+    boolean trailingSlash = StringUtils.endsWith(endpoint, "/");
+    return String.format("%s://%s%s", httpScheme, endpoint, trailingSlash ? "" : "/");
   }
 
   public static class Builder {
@@ -238,11 +249,15 @@ public class VoucherifyClient {
 
     boolean secure;
 
-    RestAdapter.LogLevel logLevel;
+    ApiVersion apiVersion = ApiVersion.V_2017_04_20;
 
-    Client.Provider clientProvider;
+    Integer connectionTimeout;
 
-    ApiVersion apiVersion;
+    Integer readTimeout;
+
+    Integer writeTimeout;
+
+    LogLevel logLevel;
 
     public Builder() {
       this.secure = true;
@@ -266,18 +281,19 @@ public class VoucherifyClient {
       return this;
     }
 
-    public Builder setClient(final Client client) {
-      if (client == null) {
-        throw new IllegalArgumentException("Cannot call setClient() with null.");
-      }
+    public Builder setConnectTimeout(Integer timeout) {
+      this.connectionTimeout = timeout;
+      return this;
+    }
 
-      return setClientProvider(new Client.Provider() {
+    public Builder setReadTimeout(Integer timeout) {
+      this.readTimeout = timeout;
+      return this;
+    }
 
-        @Override
-        public Client get() {
-          return client;
-        }
-      });
+    public Builder setWriteTimeout(Integer timeout) {
+      this.writeTimeout = timeout;
+      return this;
     }
 
     public Builder setEndpoint(String remoteUrl) {
@@ -286,20 +302,10 @@ public class VoucherifyClient {
       }
 
       this.endpoint = remoteUrl;
-      System.out.println(remoteUrl);
       return this;
     }
 
-    public Builder setClientProvider(Client.Provider clientProvider) {
-      if (clientProvider == null) {
-        throw new IllegalArgumentException("Cannot call setClientProvider() with null.");
-      }
-
-      this.clientProvider = clientProvider;
-      return this;
-    }
-
-    public Builder setLogLevel(RestAdapter.LogLevel logLevel) {
+    public Builder setLogLevel(LogLevel logLevel) {
       if (logLevel == null) {
         throw new IllegalArgumentException("Cannot call setLogLevel() with null.");
       }
@@ -319,6 +325,10 @@ public class VoucherifyClient {
     }
 
     public Builder apiVersion(ApiVersion version) {
+      if (version == null) {
+        throw new IllegalArgumentException("Cannot call apiVersion() with null.");
+      }
+
       this.apiVersion = version;
       return this;
     }
@@ -326,6 +336,5 @@ public class VoucherifyClient {
     public VoucherifyClient build() {
       return new VoucherifyClient(this);
     }
-
   }
 }

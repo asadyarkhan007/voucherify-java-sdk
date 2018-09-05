@@ -27,5 +27,4 @@ public class OrderResponse {
 
   @Singular("item")
   private List<OrderItemResponse> items;
-
 }

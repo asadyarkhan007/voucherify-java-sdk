@@ -33,5 +33,4 @@ public class TierResponse {
 
   @Singular("metadataEntry")
   private Map<String, Object> metadata;
-
 }

@@ -1,6 +1,5 @@
 package io.voucherify.example.sync;
 
-import com.sun.tools.javac.util.List;
 import io.voucherify.client.VoucherifyClient;
 import io.voucherify.client.model.Operator;
 import io.voucherify.client.model.validationRules.IdPair;
@@ -21,6 +20,7 @@ import io.voucherify.client.model.validationRules.ValidationRules;
 import io.voucherify.client.model.validationRules.response.ValidationRulesResponse;
 
 import java.util.Arrays;
+import java.util.Collections;
 
 public class ValidationRulesExample extends AbsExample {
 
@@ -39,16 +39,17 @@ public class ValidationRulesExample extends AbsExample {
   }
 
   private void userRulesExample() {
-    ValidationRules userValidationRules = ValidationRules.builder()
-        .userRules(UserValidationRules.builder()
-            .junction(Junction.AND)
-            .userLogin(UserLoginRules.builder()
-                .condition(Operator.$is, List.of("johndoe@johndoe.com"))
-                .build()
-            )
-            .build()
-        )
-        .build();
+    ValidationRules userValidationRules =
+        ValidationRules.builder()
+            .userRules(
+                UserValidationRules.builder()
+                    .junction(Junction.AND)
+                    .userLogin(
+                        UserLoginRules.builder()
+                            .condition(Operator.$is, Collections.singletonList("johndoe@johndoe.com"))
+                            .build())
+                    .build())
+            .build();
 
     ValidationRulesResponse result = client.validationRules().create(userValidationRules);
     client.validationRules().get(result.getId());
@@ -56,15 +57,17 @@ public class ValidationRulesExample extends AbsExample {
   }
 
   private void orderRulesExample() {
-    ValidationRules orderValidationRules = ValidationRules.builder()
-        .orderRules(OrderValidationRules.builder()
-            .totalAmountCondition(Operator.$less_than_or_equal, List.of(50000))
-            .productsCountCondition(Operator.$more_than, List.of(10000))
-            .allOrdersDiscountAmountCondition(Operator.$less_than_or_equal, List.of(30))
-            .allOrdersTotalAmountCondition(Operator.$is, List.of(100000))
-            .build()
-        )
-        .build();
+    ValidationRules orderValidationRules =
+        ValidationRules.builder()
+            .orderRules(
+                OrderValidationRules.builder()
+                    .totalAmountCondition(Operator.$less_than_or_equal, Collections.singletonList(50000))
+                    .productsCountCondition(Operator.$more_than, Collections.singletonList(10000))
+                    .allOrdersDiscountAmountCondition(
+                        Operator.$less_than_or_equal, Collections.singletonList(30))
+                    .allOrdersTotalAmountCondition(Operator.$is, Collections.singletonList(100000))
+                    .build())
+            .build();
 
     ValidationRulesResponse result = client.validationRules().create(orderValidationRules);
     client.validationRules().get(result.getId());
@@ -72,12 +75,13 @@ public class ValidationRulesExample extends AbsExample {
   }
 
   private void segmentRulesExample() {
-    ValidationRules segmentValidationRules = ValidationRules.builder()
-        .segmentRules(SegmentValidationRules.builder()
-            .condition(Operator.$is, List.of("a", "b"))
-            .build()
-        )
-        .build();
+    ValidationRules segmentValidationRules =
+        ValidationRules.builder()
+            .segmentRules(
+                SegmentValidationRules.builder()
+                    .condition(Operator.$is, Arrays.asList("a", "b"))
+                    .build())
+            .build();
 
     ValidationRulesResponse result = client.validationRules().create(segmentValidationRules);
     client.validationRules().get(result.getId());
@@ -85,11 +89,15 @@ public class ValidationRulesExample extends AbsExample {
   }
 
   private void productRulesExample() {
-    ValidationRules productValidationRules = ValidationRules.builder()
-        .productRules(ProductValidationRules.builder()
-            .condition(Operator.$contains, List.of(IdPair.builder().id("id").sourceId("sourceId").build()))
-            .build())
-        .build();
+    ValidationRules productValidationRules =
+        ValidationRules.builder()
+            .productRules(
+                ProductValidationRules.builder()
+                    .condition(
+                        Operator.$contains,
+                        Collections.singletonList(IdPair.builder().id("id").sourceId("sourceId").build()))
+                    .build())
+            .build();
 
     ValidationRulesResponse result = client.validationRules().create(productValidationRules);
     client.validationRules().get(result.getId());
@@ -97,43 +105,45 @@ public class ValidationRulesExample extends AbsExample {
   }
 
   private void redemptionRulesExample() {
-    ValidationRules redemptionValidationRules = ValidationRules.builder()
-        .redemptionRules(RedemptionValidationRules.builder()
-            .countPerCampaign(RedemptionCountValidationRules.builder()
-                .condition(Operator.$contains, List.of(10))
-                .build()
-            )
-            .countPerCustomer(RedemptionCountValidationRules.builder()
-                .condition(Operator.$contains, List.of(20))
-                .build()
-            )
-            .countPerCustomerPerDay(RedemptionCountValidationRules.builder()
-                .condition(Operator.$contains, List.of(30))
-                .build()
-            )
-            .countPerUser(RedemptionCountValidationRules.builder()
-                .condition(Operator.$contains, List.of(40))
-                .build()
-            )
-            .countPerCustomerPerCampaign(RedemptionCountValidationRules.builder()
-                .condition(Operator.$contains, List.of(50))
-                .build()
-            )
-            .giftCardsAmount(RedemptionCountValidationRules.builder()
-                .condition(Operator.$contains, List.of(60))
-                .build()
-            )
-            .metadata(MetadataValidationRules.builder()
-                .rule("city", MetadataRules.builder()
-                    .condition(Operator.$in, Arrays.asList("Paris", "London"))
-                    .condition(Operator.$is, Arrays.asList("Madrid"))
-                    .build()
-                )
-                .build()
-            )
-            .build()
-        )
-        .build();
+    ValidationRules redemptionValidationRules =
+        ValidationRules.builder()
+            .redemptionRules(
+                RedemptionValidationRules.builder()
+                    .countPerCampaign(
+                        RedemptionCountValidationRules.builder()
+                            .condition(Operator.$contains, Collections.singletonList(10))
+                            .build())
+                    .countPerCustomer(
+                        RedemptionCountValidationRules.builder()
+                            .condition(Operator.$contains, Collections.singletonList(20))
+                            .build())
+                    .countPerCustomerPerDay(
+                        RedemptionCountValidationRules.builder()
+                            .condition(Operator.$contains, Collections.singletonList(30))
+                            .build())
+                    .countPerUser(
+                        RedemptionCountValidationRules.builder()
+                            .condition(Operator.$contains, Collections.singletonList(40))
+                            .build())
+                    .countPerCustomerPerCampaign(
+                        RedemptionCountValidationRules.builder()
+                            .condition(Operator.$contains, Collections.singletonList(50))
+                            .build())
+                    .giftCardsAmount(
+                        RedemptionCountValidationRules.builder()
+                            .condition(Operator.$contains, Collections.singletonList(60))
+                            .build())
+                    .metadata(
+                        MetadataValidationRules.builder()
+                            .rule(
+                                "city",
+                                MetadataRules.builder()
+                                    .condition(Operator.$in, Arrays.asList("Paris", "London"))
+                                    .condition(Operator.$is, Collections.singletonList("Madrid"))
+                                    .build())
+                            .build())
+                    .build())
+            .build();
 
     ValidationRulesResponse result = client.validationRules().create(redemptionValidationRules);
 
@@ -143,15 +153,16 @@ public class ValidationRulesExample extends AbsExample {
   }
 
   private void publicationRulesExample() {
-    ValidationRules publicationValidationRules = ValidationRules.builder()
-        .publicationRules(PublicationValidationRules.builder()
-            .publishedForRedeemingCustomer(PublishedForRedeemingCustomerRules.builder()
-                .condition(Operator.$is, Arrays.asList(true))
-                .build()
-            )
-            .build()
-        )
-        .build();
+    ValidationRules publicationValidationRules =
+        ValidationRules.builder()
+            .publicationRules(
+                PublicationValidationRules.builder()
+                    .publishedForRedeemingCustomer(
+                        PublishedForRedeemingCustomerRules.builder()
+                            .condition(Operator.$is, Collections.singletonList(true))
+                            .build())
+                    .build())
+            .build();
 
     ValidationRulesResponse result = client.validationRules().create(publicationValidationRules);
 
@@ -161,16 +172,15 @@ public class ValidationRulesExample extends AbsExample {
   }
 
   private void skuRulesExample() {
-    ValidationRules skuValidationRules = ValidationRules.builder()
-        .skuRules(SkuValidationRules.builder()
-            .condition(Operator.$is, Arrays.asList(IdPair.builder()
-                .id("id")
-                .sourceId("sourceId")
-                .build())
-            )
-            .build()
-        )
-        .build();
+    ValidationRules skuValidationRules =
+        ValidationRules.builder()
+            .skuRules(
+                SkuValidationRules.builder()
+                    .condition(
+                        Operator.$is,
+                        Collections.singletonList(IdPair.builder().id("id").sourceId("sourceId").build()))
+                    .build())
+            .build();
 
     ValidationRulesResponse result = client.validationRules().create(skuValidationRules);
 

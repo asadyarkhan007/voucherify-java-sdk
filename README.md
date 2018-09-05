@@ -49,6 +49,11 @@ API:
 
 ---
 
+## Supported JRE versions
+* 8, 9, 10
+
+---
+
 ## Setup
 
 Grab via Maven:
@@ -57,14 +62,13 @@ Grab via Maven:
 <dependency>
   <groupId>io.voucherify.client</groupId>
   <artifactId>voucherify-java-sdk</artifactId>
-  <version>6.0.2</version>
+  <version>7.0.0</version>
 </dependency>
 ```
 
 or via Gradle
 ```groovy
-compile 'io.voucherify.client:voucherify-java-sdk:6.0.2'
-
+compile 'io.voucherify.client:voucherify-java-sdk:7.0.0'
 ```
 
 [Log-in](http://app.voucherify.io/?utm_source=github&utm_medium=sdk&utm_campaign=acq#/login) to Voucherify web interface and obtain your Application Keys from [Configuration](https://app.voucherify.io/?utm_source=github&utm_medium=sdk&utm_campaign=acq#/app/configuration):
@@ -651,6 +655,7 @@ voucherify.vouchers().async().create(createVoucher, new VoucherifyCallback<Vouch
 Bug reports and pull requests are welcome on GitHub at https://github.com/rspective/voucherify-java-sdk.
 
 ## Changelog
+* 2018-09-05 - 7.0.0 - Updated retrofit and rxjava to version >= 2.x. Dropped support for JDK 1.6 and 1.7
 * 2018-09-09 - 6.0.4 - Added filtering vouchers by customer.
 * 2018-05-21 - 6.0.3 - Added support for `price` when creating `Price` model.
 * 2018-04-05 - 6.0.2 - Added support for `unitType` when creating `Discount` Voucher, removed obsolete `VoucherType` from validation response. Added class `PromotionTierValidationResponse` for proper promotion tier response mapping for promotion validation returned from `voucherify.validations().validate(PromotionValidation)` method.

@@ -1,16 +1,17 @@
 package io.voucherify.client.module;
 
-import com.squareup.okhttp.mockwebserver.RecordedRequest;
+import io.reactivex.Observable;
 import io.voucherify.client.callback.VoucherifyCallback;
+import io.voucherify.client.model.Operator;
 import io.voucherify.client.model.validationRules.IdPair;
 import io.voucherify.client.model.validationRules.Junction;
-import io.voucherify.client.model.Operator;
 import io.voucherify.client.model.validationRules.OrderValidationRules;
 import io.voucherify.client.model.validationRules.ProductValidationRules;
 import io.voucherify.client.model.validationRules.ValidationRules;
 import io.voucherify.client.model.validationRules.response.ValidationRulesResponse;
+import io.voucherify.client.utils.Irrelevant;
+import okhttp3.mockwebserver.RecordedRequest;
 import org.junit.Test;
-import rx.Observable;
 
 import java.util.LinkedList;
 
@@ -20,16 +21,19 @@ import static org.awaitility.Awaitility.await;
 
 public class ValidationRulesModuleTest extends AbstractModuleTest {
 
-  private static final ValidationRules RULES = ValidationRules.builder()
+  private static final ValidationRules RULES =
+      ValidationRules.builder()
           .junction(Junction.AND)
           .id("some-id")
           .campaignName("campaign")
           .voucherCode("code")
-          .orderRules(OrderValidationRules.builder()
+          .orderRules(
+              OrderValidationRules.builder()
                   .junction(Junction.AND)
                   .productsCountCondition(Operator.$contains, new LinkedList<Integer>())
                   .build())
-          .productRules(ProductValidationRules.builder()
+          .productRules(
+              ProductValidationRules.builder()
                   .condition(Operator.$is_not, new LinkedList<IdPair>())
                   .build())
           .build();
@@ -172,7 +176,7 @@ public class ValidationRulesModuleTest extends AbstractModuleTest {
     Observable<ValidationRulesResponse> observable = client.validationRules().rx().create(RULES);
 
     // then
-    ValidationRulesResponse result = observable.toBlocking().first();
+    ValidationRulesResponse result = observable.blockingFirst();
     assertThat(result).isNotNull();
     assertThat(result.getProductRules().getConditions().containsKey(Operator.$is_not)).isTrue();
     assertThat(result.getOrderRules().getProductsCount().containsKey(Operator.$contains)).isTrue();
@@ -190,7 +194,7 @@ public class ValidationRulesModuleTest extends AbstractModuleTest {
     Observable<ValidationRulesResponse> observable = client.validationRules().rx().get("some-id");
 
     // then
-    ValidationRulesResponse result = observable.toBlocking().first();
+    ValidationRulesResponse result = observable.blockingFirst();
     assertThat(result).isNotNull();
     assertThat(result.getProductRules().getConditions().containsKey(Operator.$is_not)).isTrue();
     assertThat(result.getOrderRules().getProductsCount().containsKey(Operator.$contains)).isTrue();
@@ -208,7 +212,7 @@ public class ValidationRulesModuleTest extends AbstractModuleTest {
     Observable<ValidationRulesResponse> observable = client.validationRules().rx().update(RULES);
 
     // then
-    ValidationRulesResponse result = observable.toBlocking().first();
+    ValidationRulesResponse result = observable.blockingFirst();
     assertThat(result).isNotNull();
     assertThat(result.getProductRules().getConditions().containsKey(Operator.$is_not)).isTrue();
     assertThat(result.getOrderRules().getProductsCount().containsKey(Operator.$contains)).isTrue();
@@ -223,10 +227,10 @@ public class ValidationRulesModuleTest extends AbstractModuleTest {
     enqueueEmptyResponse();
 
     // when
-    Observable<Void> observable = client.validationRules().rx().delete("some-id");
+    Observable<Irrelevant> observable = client.validationRules().rx().delete("some-id");
 
     // then
-    observable.toBlocking().first();
+    observable.blockingFirst();
     RecordedRequest request = getRequest();
     assertThat(request.getPath()).isEqualTo("/validation-rules/some-id");
     assertThat(request.getMethod()).isEqualTo("DELETE");

@@ -1,6 +1,6 @@
 package io.voucherify.client.module;
 
-import com.squareup.okhttp.mockwebserver.RecordedRequest;
+import io.reactivex.Observable;
 import io.voucherify.client.callback.VoucherifyCallback;
 import io.voucherify.client.model.voucher.AddBalance;
 import io.voucherify.client.model.voucher.CreateVoucher;
@@ -8,15 +8,14 @@ import io.voucherify.client.model.voucher.Discount;
 import io.voucherify.client.model.voucher.ImportVouchers;
 import io.voucherify.client.model.voucher.Voucher;
 import io.voucherify.client.model.voucher.VoucherType;
-import io.voucherify.client.model.voucher.response.AddBalanceResponse;
-import io.voucherify.client.model.voucher.response.VouchersResponse;
-import org.junit.Test;
 import io.voucherify.client.model.voucher.VoucherUpdate;
 import io.voucherify.client.model.voucher.VouchersFilter;
+import io.voucherify.client.model.voucher.response.AddBalanceResponse;
 import io.voucherify.client.model.voucher.response.VoucherResponse;
-import rx.Observable;
-
-import java.util.List;
+import io.voucherify.client.model.voucher.response.VouchersResponse;
+import io.voucherify.client.utils.Irrelevant;
+import okhttp3.mockwebserver.RecordedRequest;
+import org.junit.Test;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -27,8 +26,12 @@ public class VoucherModuleTest extends AbstractModuleTest {
   @Test
   public void shouldCreateVoucher() {
     // given
-    Voucher voucher = Voucher.builder().active(true).category("category")
-            .campaign("my-campaign").isReferralCode(false)
+    Voucher voucher =
+        Voucher.builder()
+            .active(true)
+            .category("category")
+            .campaign("my-campaign")
+            .isReferralCode(false)
             .discount(Discount.unitOff(10.0))
             .build();
 
@@ -49,10 +52,13 @@ public class VoucherModuleTest extends AbstractModuleTest {
   @Test
   public void shouldGetVoucher() {
     // given
-    Voucher voucher = Voucher.builder()
+    Voucher voucher =
+        Voucher.builder()
             .code("some-code")
-            .active(true).category("category")
-            .campaign("my-campaign").isReferralCode(false)
+            .active(true)
+            .category("category")
+            .campaign("my-campaign")
+            .isReferralCode(false)
             .discount(Discount.unitOff(10.0))
             .build();
 
@@ -72,16 +78,23 @@ public class VoucherModuleTest extends AbstractModuleTest {
   @Test
   public void shouldListVouchers() throws Exception {
     // given
-    Voucher voucher = Voucher.builder()
+    Voucher voucher =
+        Voucher.builder()
             .code("some-code")
-            .active(true).category("category")
-            .campaign("my-campaign").isReferralCode(false)
+            .active(true)
+            .category("category")
+            .campaign("my-campaign")
+            .isReferralCode(false)
             .discount(Discount.unitOff(10.0))
             .build();
 
-    enqueueResponse("[" + mapper.writeValueAsString(voucher) + "]");
+    enqueueResponse(
+        "{\"total\": 10, \"object\": \"list\", \"data_ref\": \"text\", \"vouchers\": ["
+            + mapper.writeValueAsString(voucher)
+            + "]}");
 
-    VouchersFilter filter = VouchersFilter.builder()
+    VouchersFilter filter =
+        VouchersFilter.builder()
             .limit(10)
             .page(5)
             .campaign("some-campaign")
@@ -94,24 +107,25 @@ public class VoucherModuleTest extends AbstractModuleTest {
     // then
     assertThat(list).isNotNull();
     RecordedRequest request = getRequest();
-    assertThat(request.getPath()).isEqualTo("/vouchers?limit=10&campaign=some-campaign&page=5&category=some-category");
+    assertThat(request.getPath())
+        .isEqualTo("/vouchers?limit=10&campaign=some-campaign&page=5&category=some-category");
     assertThat(request.getMethod()).isEqualTo("GET");
   }
 
   @Test
   public void shouldUpdateVoucher() {
     // given
-    Voucher voucher = Voucher.builder()
+    Voucher voucher =
+        Voucher.builder()
             .code("some-code")
-            .active(false).category("some-category")
-            .campaign("my-campaign").isReferralCode(false)
+            .active(false)
+            .category("some-category")
+            .campaign("my-campaign")
+            .isReferralCode(false)
             .discount(Discount.unitOff(10.0))
             .build();
 
-    VoucherUpdate update = VoucherUpdate.builder()
-            .active(false)
-            .category("some-category")
-            .build();
+    VoucherUpdate update = VoucherUpdate.builder().active(false).category("some-category").build();
 
     enqueueResponse(voucher);
 
@@ -129,10 +143,13 @@ public class VoucherModuleTest extends AbstractModuleTest {
   @Test
   public void shouldDisableVoucher() {
     // given
-    Voucher voucher = Voucher.builder()
+    Voucher voucher =
+        Voucher.builder()
             .code("some-code")
-            .active(false).category("some-category")
-            .campaign("my-campaign").isReferralCode(false)
+            .active(false)
+            .category("some-category")
+            .campaign("my-campaign")
+            .isReferralCode(false)
             .discount(Discount.unitOff(10.0))
             .build();
 
@@ -151,10 +168,13 @@ public class VoucherModuleTest extends AbstractModuleTest {
   @Test
   public void shouldEnableVoucher() {
     // given
-    Voucher voucher = Voucher.builder()
+    Voucher voucher =
+        Voucher.builder()
             .code("some-code")
-            .active(true).category("some-category")
-            .campaign("my-campaign").isReferralCode(false)
+            .active(true)
+            .category("some-category")
+            .campaign("my-campaign")
+            .isReferralCode(false)
             .discount(Discount.unitOff(10.0))
             .build();
 
@@ -192,8 +212,12 @@ public class VoucherModuleTest extends AbstractModuleTest {
   @Test
   public void shouldImportVouchers() {
     // given
-    Voucher voucher = Voucher.builder().active(true).category("category")
-            .campaign("my-campaign").isReferralCode(false)
+    Voucher voucher =
+        Voucher.builder()
+            .active(true)
+            .category("category")
+            .campaign("my-campaign")
+            .isReferralCode(false)
             .discount(Discount.unitOff(10.0))
             .build();
 
@@ -213,8 +237,12 @@ public class VoucherModuleTest extends AbstractModuleTest {
   @Test
   public void shouldCreateVoucherAsync() {
     // given
-    Voucher voucher = Voucher.builder().active(true).category("category")
-            .campaign("my-campaign").isReferralCode(false)
+    Voucher voucher =
+        Voucher.builder()
+            .active(true)
+            .category("category")
+            .campaign("my-campaign")
+            .isReferralCode(false)
             .discount(Discount.unitOff(10.0))
             .build();
 
@@ -237,10 +265,13 @@ public class VoucherModuleTest extends AbstractModuleTest {
   @Test
   public void shouldGetVoucherAsync() {
     // given
-    Voucher voucher = Voucher.builder()
+    Voucher voucher =
+        Voucher.builder()
             .code("some-code")
-            .active(true).category("category")
-            .campaign("my-campaign").isReferralCode(false)
+            .active(true)
+            .category("category")
+            .campaign("my-campaign")
+            .isReferralCode(false)
             .discount(Discount.unitOff(10.0))
             .build();
 
@@ -261,18 +292,25 @@ public class VoucherModuleTest extends AbstractModuleTest {
   @Test
   public void shouldListVouchersAsync() throws Exception {
     // given
-    Voucher voucher = Voucher.builder()
+    Voucher voucher =
+        Voucher.builder()
             .code("some-code")
-            .active(true).category("category")
-            .campaign("my-campaign").isReferralCode(false)
+            .active(true)
+            .category("category")
+            .campaign("my-campaign")
+            .isReferralCode(false)
             .discount(Discount.unitOff(10.0))
             .build();
 
-    enqueueResponse("[" + mapper.writeValueAsString(voucher) + "]");
+    enqueueResponse(
+        "{\"total\": 10, \"object\": \"list\", \"data_ref\": \"text\", \"vouchers\": ["
+            + mapper.writeValueAsString(voucher)
+            + "]}");
 
     VoucherifyCallback callback = createCallback();
 
-    VouchersFilter filter = VouchersFilter.builder()
+    VouchersFilter filter =
+        VouchersFilter.builder()
             .limit(10)
             .page(5)
             .campaign("some-campaign")
@@ -285,24 +323,25 @@ public class VoucherModuleTest extends AbstractModuleTest {
     // then
     await().atMost(5, SECONDS).until(wasCallbackFired());
     RecordedRequest request = getRequest();
-    assertThat(request.getPath()).isEqualTo("/vouchers?limit=10&campaign=some-campaign&page=5&category=some-category");
+    assertThat(request.getPath())
+        .isEqualTo("/vouchers?limit=10&campaign=some-campaign&page=5&category=some-category");
     assertThat(request.getMethod()).isEqualTo("GET");
   }
 
   @Test
   public void shouldUpdateVoucherAsync() {
     // given
-    Voucher voucher = Voucher.builder()
+    Voucher voucher =
+        Voucher.builder()
             .code("some-code")
-            .active(false).category("some-category")
-            .campaign("my-campaign").isReferralCode(false)
+            .active(false)
+            .category("some-category")
+            .campaign("my-campaign")
+            .isReferralCode(false)
             .discount(Discount.unitOff(10.0))
             .build();
 
-    VoucherUpdate update = VoucherUpdate.builder()
-            .active(false)
-            .category("some-category")
-            .build();
+    VoucherUpdate update = VoucherUpdate.builder().active(false).category("some-category").build();
 
     VoucherifyCallback callback = createCallback();
 
@@ -321,10 +360,13 @@ public class VoucherModuleTest extends AbstractModuleTest {
   @Test
   public void shouldDisableVoucherAsync() {
     // given
-    Voucher voucher = Voucher.builder()
+    Voucher voucher =
+        Voucher.builder()
             .code("some-code")
-            .active(false).category("some-category")
-            .campaign("my-campaign").isReferralCode(false)
+            .active(false)
+            .category("some-category")
+            .campaign("my-campaign")
+            .isReferralCode(false)
             .discount(Discount.unitOff(10.0))
             .build();
 
@@ -345,10 +387,13 @@ public class VoucherModuleTest extends AbstractModuleTest {
   @Test
   public void shouldEnableVoucherAsync() {
     // given
-    Voucher voucher = Voucher.builder()
+    Voucher voucher =
+        Voucher.builder()
             .code("some-code")
-            .active(true).category("some-category")
-            .campaign("my-campaign").isReferralCode(false)
+            .active(true)
+            .category("some-category")
+            .campaign("my-campaign")
+            .isReferralCode(false)
             .discount(Discount.unitOff(10.0))
             .build();
 
@@ -386,8 +431,12 @@ public class VoucherModuleTest extends AbstractModuleTest {
   @Test
   public void shouldImportVouchersAsync() {
     // given
-    Voucher voucher = Voucher.builder().active(true).category("category")
-            .campaign("my-campaign").isReferralCode(false)
+    Voucher voucher =
+        Voucher.builder()
+            .active(true)
+            .category("category")
+            .campaign("my-campaign")
+            .isReferralCode(false)
             .discount(Discount.unitOff(10.0))
             .build();
 
@@ -410,8 +459,12 @@ public class VoucherModuleTest extends AbstractModuleTest {
   @Test
   public void shouldCreateVoucherRxJava() {
     // given
-    Voucher voucher = Voucher.builder().active(true).category("category")
-            .campaign("my-campaign").isReferralCode(false)
+    Voucher voucher =
+        Voucher.builder()
+            .active(true)
+            .category("category")
+            .campaign("my-campaign")
+            .isReferralCode(false)
             .discount(Discount.unitOff(10.0))
             .build();
 
@@ -423,7 +476,7 @@ public class VoucherModuleTest extends AbstractModuleTest {
     Observable<VoucherResponse> observable = client.vouchers().rx().create(createVoucher);
 
     // then
-    VoucherResponse result = observable.toBlocking().first();
+    VoucherResponse result = observable.blockingFirst();
     assertThat(result).isNotNull();
     RecordedRequest request = getRequest();
     assertThat(request.getPath()).isEqualTo("/vouchers");
@@ -433,10 +486,13 @@ public class VoucherModuleTest extends AbstractModuleTest {
   @Test
   public void shouldGetVoucherRxJava() {
     // given
-    Voucher voucher = Voucher.builder()
+    Voucher voucher =
+        Voucher.builder()
             .code("some-code")
-            .active(true).category("category")
-            .campaign("my-campaign").isReferralCode(false)
+            .active(true)
+            .category("category")
+            .campaign("my-campaign")
+            .isReferralCode(false)
             .discount(Discount.unitOff(10.0))
             .build();
 
@@ -446,7 +502,7 @@ public class VoucherModuleTest extends AbstractModuleTest {
     Observable<VoucherResponse> observable = client.vouchers().rx().get("some-code");
 
     // then
-    VoucherResponse result = observable.toBlocking().first();
+    VoucherResponse result = observable.blockingFirst();
     assertThat(result).isNotNull();
     assertThat(result.getCode()).isEqualTo(voucher.getCode());
     RecordedRequest request = getRequest();
@@ -457,16 +513,23 @@ public class VoucherModuleTest extends AbstractModuleTest {
   @Test
   public void shouldListVouchersRxJava() throws Exception {
     // given
-    Voucher voucher = Voucher.builder()
+    Voucher voucher =
+        Voucher.builder()
             .code("some-code")
-            .active(true).category("category")
-            .campaign("my-campaign").isReferralCode(false)
+            .active(true)
+            .category("category")
+            .campaign("my-campaign")
+            .isReferralCode(false)
             .discount(Discount.unitOff(10.0))
             .build();
 
-    enqueueResponse("[" + mapper.writeValueAsString(voucher) + "]");
+    enqueueResponse(
+        "{\"total\": 10, \"object\": \"list\", \"data_ref\": \"text\", \"vouchers\": ["
+            + mapper.writeValueAsString(voucher)
+            + "]}");
 
-    VouchersFilter filter = VouchersFilter.builder()
+    VouchersFilter filter =
+        VouchersFilter.builder()
             .limit(10)
             .page(5)
             .campaign("some-campaign")
@@ -477,27 +540,28 @@ public class VoucherModuleTest extends AbstractModuleTest {
     Observable<VouchersResponse> observable = client.vouchers().rx().list(filter);
 
     // then
-    VouchersResponse result = observable.toBlocking().first();
+    VouchersResponse result = observable.blockingFirst();
     assertThat(result).isNotNull();
     RecordedRequest request = getRequest();
-    assertThat(request.getPath()).isEqualTo("/vouchers?limit=10&campaign=some-campaign&page=5&category=some-category");
+    assertThat(request.getPath())
+        .isEqualTo("/vouchers?limit=10&campaign=some-campaign&page=5&category=some-category");
     assertThat(request.getMethod()).isEqualTo("GET");
   }
 
   @Test
   public void shouldUpdateVoucherRxJava() {
     // given
-    Voucher voucher = Voucher.builder()
+    Voucher voucher =
+        Voucher.builder()
             .code("some-code")
-            .active(false).category("some-category")
-            .campaign("my-campaign").isReferralCode(false)
+            .active(false)
+            .category("some-category")
+            .campaign("my-campaign")
+            .isReferralCode(false)
             .discount(Discount.unitOff(10.0))
             .build();
 
-    VoucherUpdate update = VoucherUpdate.builder()
-            .active(false)
-            .category("some-category")
-            .build();
+    VoucherUpdate update = VoucherUpdate.builder().active(false).category("some-category").build();
 
     enqueueResponse(voucher);
 
@@ -505,7 +569,7 @@ public class VoucherModuleTest extends AbstractModuleTest {
     Observable<VoucherResponse> observable = client.vouchers().rx().update("some-code", update);
 
     // then
-    VoucherResponse result = observable.toBlocking().first();
+    VoucherResponse result = observable.blockingFirst();
     assertThat(result.getCategory()).isEqualTo("some-category");
     assertThat(result.getActive()).isEqualTo(false);
     RecordedRequest request = getRequest();
@@ -516,10 +580,13 @@ public class VoucherModuleTest extends AbstractModuleTest {
   @Test
   public void shouldDisableVoucherRxJava() {
     // given
-    Voucher voucher = Voucher.builder()
+    Voucher voucher =
+        Voucher.builder()
             .code("some-code")
-            .active(false).category("some-category")
-            .campaign("my-campaign").isReferralCode(false)
+            .active(false)
+            .category("some-category")
+            .campaign("my-campaign")
+            .isReferralCode(false)
             .discount(Discount.unitOff(10.0))
             .build();
 
@@ -529,7 +596,7 @@ public class VoucherModuleTest extends AbstractModuleTest {
     Observable<VoucherResponse> observable = client.vouchers().rx().disable("some-code");
 
     // then
-    VoucherResponse result = observable.toBlocking().first();
+    VoucherResponse result = observable.blockingFirst();
     assertThat(result.getActive()).isEqualTo(false);
     RecordedRequest request = getRequest();
     assertThat(request.getPath()).isEqualTo("/vouchers/some-code/disable");
@@ -539,10 +606,13 @@ public class VoucherModuleTest extends AbstractModuleTest {
   @Test
   public void shouldEnableVoucherRxJava() {
     // given
-    Voucher voucher = Voucher.builder()
+    Voucher voucher =
+        Voucher.builder()
             .code("some-code")
-            .active(true).category("some-category")
-            .campaign("my-campaign").isReferralCode(false)
+            .active(true)
+            .category("some-category")
+            .campaign("my-campaign")
+            .isReferralCode(false)
             .discount(Discount.unitOff(10.0))
             .build();
 
@@ -552,7 +622,7 @@ public class VoucherModuleTest extends AbstractModuleTest {
     Observable<VoucherResponse> observable = client.vouchers().rx().enable("some-code");
 
     // then
-    VoucherResponse result = observable.toBlocking().first();
+    VoucherResponse result = observable.blockingFirst();
     assertThat(result.getActive()).isEqualTo(true);
     RecordedRequest request = getRequest();
     assertThat(request.getPath()).isEqualTo("/vouchers/some-code/enable");
@@ -566,10 +636,11 @@ public class VoucherModuleTest extends AbstractModuleTest {
     enqueueResponse("{\"amount\": 1000, \"object\": \"voucher\", \"type\": \"GIFT_VOUCHER\"}");
 
     // when
-    Observable<AddBalanceResponse> observable = client.vouchers().rx().addBalance("some-code", addBalance);
+    Observable<AddBalanceResponse> observable =
+        client.vouchers().rx().addBalance("some-code", addBalance);
 
     // then
-    AddBalanceResponse response = observable.toBlocking().first();
+    AddBalanceResponse response = observable.blockingFirst();
     assertThat(response).isNotNull();
     assertThat(response.getAmount()).isEqualTo(1000);
     assertThat(response.getObject()).isEqualTo("voucher");
@@ -582,8 +653,12 @@ public class VoucherModuleTest extends AbstractModuleTest {
   @Test
   public void shouldImportVouchersRxJava() {
     // given
-    Voucher voucher = Voucher.builder().active(true).category("category")
-            .campaign("my-campaign").isReferralCode(false)
+    Voucher voucher =
+        Voucher.builder()
+            .active(true)
+            .category("category")
+            .campaign("my-campaign")
+            .isReferralCode(false)
             .discount(Discount.unitOff(10.0))
             .build();
 
@@ -592,10 +667,10 @@ public class VoucherModuleTest extends AbstractModuleTest {
     enqueueEmptyResponse();
 
     // when
-    Observable<Void> observable = client.vouchers().rx().importVouchers(importVouchers);
+    Observable<Irrelevant> observable = client.vouchers().rx().importVouchers(importVouchers);
 
     // then
-    observable.toBlocking().first();
+    observable.blockingFirst();
     RecordedRequest request = getRequest();
     assertThat(request.getPath()).isEqualTo("/vouchers/import");
     assertThat(request.getMethod()).isEqualTo("POST");

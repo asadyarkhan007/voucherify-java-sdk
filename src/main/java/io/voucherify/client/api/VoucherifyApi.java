@@ -57,14 +57,15 @@ import io.voucherify.client.model.voucher.VoucherUpdate;
 import io.voucherify.client.model.voucher.response.AddBalanceResponse;
 import io.voucherify.client.model.voucher.response.VoucherResponse;
 import io.voucherify.client.model.voucher.response.VouchersResponse;
-import retrofit.http.Body;
-import retrofit.http.DELETE;
-import retrofit.http.GET;
-import retrofit.http.POST;
-import retrofit.http.PUT;
-import retrofit.http.Path;
-import retrofit.http.Query;
-import retrofit.http.QueryMap;
+import retrofit2.Call;
+import retrofit2.http.Body;
+import retrofit2.http.DELETE;
+import retrofit2.http.GET;
+import retrofit2.http.POST;
+import retrofit2.http.PUT;
+import retrofit2.http.Path;
+import retrofit2.http.Query;
+import retrofit2.http.QueryMap;
 
 import java.util.Map;
 
@@ -72,214 +73,232 @@ public interface VoucherifyApi {
 
   // CAMPAIGNS
 
-  @POST("/campaigns")
-  CampaignResponse createCampaign(@Body CreateCampaign createCampaign);
+  @POST("campaigns")
+  Call<CampaignResponse> createCampaign(@Body CreateCampaign createCampaign);
 
-  @POST("/campaigns/{name}/vouchers")
-  AddVoucherToCampaignResponse addVoucherToCampaign(@Path("name") String campaignName, @Body AddVoucherToCampaign addVoucherToCampaign);
+  @POST("campaigns/{name}/vouchers")
+  Call<AddVoucherToCampaignResponse> addVoucherToCampaign(
+      @Path("name") String campaignName, @Body AddVoucherToCampaign addVoucherToCampaign);
 
-  @GET("/campaigns/{name}")
-  CampaignResponse getCampaign(@Path("name") String campaignName);
+  @GET("campaigns/{name}")
+  Call<CampaignResponse> getCampaign(@Path("name") String campaignName);
 
-  @GET("/campaigns")
-  CampaignsResponse listCampaigns(@QueryMap Map<String, Object> filter);
+  @GET("campaigns")
+  Call<CampaignsResponse> listCampaigns(@QueryMap Map<String, Object> filter);
 
-  @PUT("/campaigns/{name}")
-  CampaignResponse updateCampaign(@Path("name") String campaignName, @Body UpdateCampaign updateCampaign);
+  @PUT("campaigns/{name}")
+  Call<CampaignResponse> updateCampaign(
+      @Path("name") String campaignName, @Body UpdateCampaign updateCampaign);
 
-  @POST("/campaigns/{name}/vouchers/{code}")
-  AddVoucherToCampaignResponse addVoucherToCampaignWithCode(@Path("name") String campaignName, @Path("code") String voucherCode, @Body AddVoucherToCampaign addVoucherToCampaign);
+  @POST("campaigns/{name}/vouchers/{code}")
+  Call<AddVoucherToCampaignResponse> addVoucherToCampaignWithCode(
+      @Path("name") String campaignName,
+      @Path("code") String voucherCode,
+      @Body AddVoucherToCampaign addVoucherToCampaign);
 
-  @DELETE("/campaigns/{name}")
-  Void deleteCampaign(@Path("name") String campaignName, @Query("force") Boolean force);
+  @DELETE("campaigns/{name}")
+  Call<Void> deleteCampaign(@Path("name") String campaignName, @Query("force") Boolean force);
 
-  @POST("/campaigns/{name}/import")
-  Void importVouchersToCampaign(@Path("name") String campaignName, @Body CampaignImportVouchers importVouchers);
+  @POST("campaigns/{name}/import")
+  Call<Void> importVouchersToCampaign(
+      @Path("name") String campaignName, @Body CampaignImportVouchers importVouchers);
 
   // CUSTOMERS
 
-  @POST("/customers")
-  CustomerResponse createCustomer(@Body Customer customer);
+  @POST("customers")
+  Call<CustomerResponse> createCustomer(@Body Customer customer);
 
-  @GET("/customers/{id}")
-  CustomerResponse getCustomerById(@Path("id") String customerId);
+  @GET("customers/{id}")
+  Call<CustomerResponse> getCustomerById(@Path("id") String customerId);
 
-  @PUT("/customers/{id}")
-  CustomerResponse updateCustomer(@Path("id") String customerId, @Body Customer customer);
+  @PUT("customers/{id}")
+  Call<CustomerResponse> updateCustomer(@Path("id") String customerId, @Body Customer customer);
 
-  @DELETE("/customers/{id}")
-  Void deleteCustomer(@Path("id") String customerId);
+  @DELETE("customers/{id}")
+  Call<Void> deleteCustomer(@Path("id") String customerId);
 
-  @GET("/customers")
-  CustomersResponse listCustomers(@QueryMap Map<String, Object> filter);
+  @GET("customers")
+  Call<CustomersResponse> listCustomers(@QueryMap Map<String, Object> filter);
 
   // REDEMPTIONS
 
-  @POST("/vouchers/{code}/redemption")
-  RedeemVoucherResponse redeem(@Path("code") String code, @Body RedeemVoucher redeemVoucher);
+  @POST("vouchers/{code}/redemption")
+  Call<RedeemVoucherResponse> redeem(@Path("code") String code, @Body RedeemVoucher redeemVoucher);
 
-  @POST("/promotions/tiers/{id}/redemption")
-  RedeemPromotionResponse redeem(@Path("id") String id, @Body RedeemPromotion redeemPromotion);
+  @POST("promotions/tiers/{id}/redemption")
+  Call<RedeemPromotionResponse> redeem(
+      @Path("id") String id, @Body RedeemPromotion redeemPromotion);
 
-  @GET("/redemptions")
-  RedemptionsResponse listRedemptions(@QueryMap Map<String, Object> filter);
+  @GET("redemptions")
+  Call<RedemptionsResponse> listRedemptions(@QueryMap Map<String, Object> filter);
 
-  @GET("/vouchers/{code}/redemption")
-  VoucherRedemptionsResponse getVoucherRedemptions(@Path("code") String code);
+  @GET("vouchers/{code}/redemption")
+  Call<VoucherRedemptionsResponse> getVoucherRedemptions(@Path("code") String code);
 
-  @POST("/redemptions/{id}/rollback")
-  RollbackRedemptionResponse rollbackRedemption(@Path("id") String redemptionId, @Query("reason") String reason, @Body RollbackRedemption rollbackRedemption);
+  @POST("redemptions/{id}/rollback")
+  Call<RollbackRedemptionResponse> rollbackRedemption(
+      @Path("id") String redemptionId,
+      @Query("reason") String reason,
+      @Body RollbackRedemption rollbackRedemption);
 
-  @GET("/redemptions/{id}")
-  RedemptionEntryResponse getRedemption(@Path("id") String redemptionId);
+  @GET("redemptions/{id}")
+  Call<RedemptionEntryResponse> getRedemption(@Path("id") String redemptionId);
 
   // DISTRIBUTIONS
 
-  @POST("/vouchers/publish")
-  PublishVoucherResponse publishVoucher(@Body PublishVoucher publishVoucher);
+  @POST("vouchers/publish")
+  Call<PublishVoucherResponse> publishVoucher(@Body PublishVoucher publishVoucher);
 
-  @POST("/exports")
-  ExportResponse createExport(@Body CreateExport createExport);
+  @POST("exports")
+  Call<ExportResponse> createExport(@Body CreateExport createExport);
 
-  @GET("/exports/{id}")
-  ExportResponse getExport(@Path("id") String id);
+  @GET("exports/{id}")
+  Call<ExportResponse> getExport(@Path("id") String id);
 
-  @DELETE("/exports/{id}")
-  Void deleteExport(@Path("id") String id);
+  @DELETE("exports/{id}")
+  Call<Void> deleteExport(@Path("id") String id);
 
-  @GET("/publications")
-  ListPublicationsResponse list(@QueryMap Map<String, Object> filter);
+  @GET("publications")
+  Call<ListPublicationsResponse> list(@QueryMap Map<String, Object> filter);
 
   // VOUCHERS
 
-  @POST("/vouchers")
-  VoucherResponse createVoucher(@Body CreateVoucher createVoucher);
+  @POST("vouchers")
+  Call<VoucherResponse> createVoucher(@Body CreateVoucher createVoucher);
 
-  @POST("/vouchers/{code}")
-  VoucherResponse createVoucher(@Path("code") String code, @Body CreateVoucher createVoucher);
+  @POST("vouchers/{code}")
+  Call<VoucherResponse> createVoucher(@Path("code") String code, @Body CreateVoucher createVoucher);
 
-  @GET("/vouchers/{code}")
-  VoucherResponse getVoucher(@Path("code") String code);
+  @GET("vouchers/{code}")
+  Call<VoucherResponse> getVoucher(@Path("code") String code);
 
-  @PUT("/vouchers/{code}")
-  VoucherResponse updateVoucher(@Path("code") String code, @Body VoucherUpdate voucherUpdate);
+  @PUT("vouchers/{code}")
+  Call<VoucherResponse> updateVoucher(@Path("code") String code, @Body VoucherUpdate voucherUpdate);
 
-  @DELETE("/vouchers/{code}")
-  Void deleteVoucher(@Path("code") String code, @Query("force") Boolean force);
+  @DELETE("vouchers/{code}")
+  Call<Void> deleteVoucher(@Path("code") String code, @Query("force") Boolean force);
 
-  @GET("/vouchers")
-  VouchersResponse listVouchers(@QueryMap Map<String, Object> filter);
+  @GET("vouchers")
+  Call<VouchersResponse> listVouchers(@QueryMap Map<String, Object> filter);
 
-  @POST("/vouchers/{code}/enable")
-  VoucherResponse enable(@Path("code") String code);
+  @POST("vouchers/{code}/enable")
+  Call<VoucherResponse> enable(@Path("code") String code);
 
-  @POST("/vouchers/{code}/disable")
-  VoucherResponse disable(@Path("code") String code);
+  @POST("vouchers/{code}/disable")
+  Call<VoucherResponse> disable(@Path("code") String code);
 
-  @POST("/vouchers/{code}/balance")
-  AddBalanceResponse addBalance(@Path("code") String code, @Body AddBalance addBalance);
+  @POST("vouchers/{code}/balance")
+  Call<AddBalanceResponse> addBalance(@Path("code") String code, @Body AddBalance addBalance);
 
-  @POST("/vouchers/import")
-  Void importVouchers(@Body ImportVouchers vouchers);
+  @POST("vouchers/import")
+  Call<Void> importVouchers(@Body ImportVouchers vouchers);
 
   // VALIDATIONS
 
-  @POST("/vouchers/{code}/validate")
-  VoucherValidationResponse validateVoucher(@Path("code") String code, @Body VoucherValidation voucherValidation);
+  @POST("vouchers/{code}/validate")
+  Call<VoucherValidationResponse> validateVoucher(
+      @Path("code") String code, @Body VoucherValidation voucherValidation);
 
-  @POST("/promotions/validation")
-  PromotionValidationResponse validatePromotion(@Body PromotionValidation promotionValidation);
+  @POST("promotions/validation")
+  Call<PromotionValidationResponse> validatePromotion(
+      @Body PromotionValidation promotionValidation);
 
   // PRODUCTS
 
-  @POST("/products")
-  ProductResponse createProduct(@Body Product product);
+  @POST("products")
+  Call<ProductResponse> createProduct(@Body Product product);
 
-  @GET("/products/{id}")
-  ProductResponse getProduct(@Path("id") String id);
+  @GET("products/{id}")
+  Call<ProductResponse> getProduct(@Path("id") String id);
 
-  @PUT("/products/{id}")
-  ProductResponse updateProduct(@Path("id") String id, @Body Product product);
+  @PUT("products/{id}")
+  Call<ProductResponse> updateProduct(@Path("id") String id, @Body Product product);
 
-  @GET("/products")
-  ProductsResponse getProducts(@QueryMap Map<String, Object> filter);
+  @GET("products")
+  Call<ProductsResponse> getProducts(@QueryMap Map<String, Object> filter);
 
-  @DELETE("/products/{id}")
-  Void deleteProduct(@Path("id") String id, @QueryMap Map<String, Object> params);
+  @DELETE("products/{id}")
+  Call<Void> deleteProduct(@Path("id") String id, @QueryMap Map<String, Object> params);
 
   // SKU
 
-  @POST("/products/{id}/skus")
-  SKUResponse createSKU(@Path("id") String productId, @Body SKU sku);
+  @POST("products/{id}/skus")
+  Call<SKUResponse> createSKU(@Path("id") String productId, @Body SKU sku);
 
-  @GET("/products/{id}/skus/{skuId}")
-  SKUResponse getSKU(@Path("id") String productId, @Path("skuId") String skuId);
+  @GET("products/{id}/skus/{skuId}")
+  Call<SKUResponse> getSKU(@Path("id") String productId, @Path("skuId") String skuId);
 
-  @PUT("/products/{id}/skus/{skuId}")
-  SKUResponse updateSKU(@Path("id") String productId, @Path("skuId") String skuId, @Body SKU sku);
+  @PUT("products/{id}/skus/{skuId}")
+  Call<SKUResponse> updateSKU(
+      @Path("id") String productId, @Path("skuId") String skuId, @Body SKU sku);
 
-  @GET("/products/{id}/skus")
-  SKUsResponse getSKUs(@Path("id") String productId);
+  @GET("products/{id}/skus")
+  Call<SKUsResponse> getSKUs(@Path("id") String productId);
 
-  @DELETE("/products/{id}/skus/{skuId}")
-  Void deleteSKU(@Path("id") String productId, @Path("skuId") String skuId, @QueryMap Map<String, Object> params);
+  @DELETE("products/{id}/skus/{skuId}")
+  Call<Void> deleteSKU(
+      @Path("id") String productId,
+      @Path("skuId") String skuId,
+      @QueryMap Map<String, Object> params);
 
   // SEGMENTS
 
-  @POST("/segments")
-  SegmentResponse createSegment(@Body Segment segment);
+  @POST("segments")
+  Call<SegmentResponse> createSegment(@Body Segment segment);
 
-  @GET("/segments/{id}")
-  SegmentResponse getSegment(@Path("id") String id);
+  @GET("segments/{id}")
+  Call<SegmentResponse> getSegment(@Path("id") String id);
 
-  @DELETE("/segments/{id}")
-  Void deleteSegment(@Path("id") String id);
+  @DELETE("segments/{id}")
+  Call<Void> deleteSegment(@Path("id") String id);
 
   // VALIDATION RULES
 
-  @POST("/validation-rules")
-  ValidationRulesResponse createValidationRules(@Body ValidationRules validationRules);
+  @POST("validation-rules")
+  Call<ValidationRulesResponse> createValidationRules(@Body ValidationRules validationRules);
 
-  @GET("/validation-rules/{id}")
-  ValidationRulesResponse getValidationRules(@Path("id") String id);
+  @GET("validation-rules/{id}")
+  Call<ValidationRulesResponse> getValidationRules(@Path("id") String id);
 
-  @PUT("/validation-rules/{id}")
-  ValidationRulesResponse updateValidationRules(@Path("id") String id, @Body ValidationRules validationRules);
+  @PUT("validation-rules/{id}")
+  Call<ValidationRulesResponse> updateValidationRules(
+      @Path("id") String id, @Body ValidationRules validationRules);
 
-  @DELETE("/validation-rules/{id}")
-  Void deleteValidationRules(@Path("id") String id);
+  @DELETE("validation-rules/{id}")
+  Call<Void> deleteValidationRules(@Path("id") String id);
 
   // PROMOTIONS
 
-  @POST("/campaigns")
-  CreatePromotionCampaignResponse createPromotionCampaign(@Body CreatePromotionCampaign createPromotionCampaign);
+  @POST("campaigns")
+  Call<CreatePromotionCampaignResponse> createPromotionCampaign(
+      @Body CreatePromotionCampaign createPromotionCampaign);
 
-  @GET("/promotions/{id}/tiers")
-  ListPromotionTiersResponse listPromotionTiers(@Path("id") String id);
+  @GET("promotions/{id}/tiers")
+  Call<ListPromotionTiersResponse> listPromotionTiers(@Path("id") String id);
 
-  @POST("/promotions/{id}/tiers")
-  TierResponse addPromotionTier(@Path("id") String id, @Body Tier tier);
+  @POST("promotions/{id}/tiers")
+  Call<TierResponse> addPromotionTier(@Path("id") String id, @Body Tier tier);
 
-  @PUT("/promotions/tiers/{id}")
-  TierResponse updatePromotionTier(@Path("id") String id, @Body Tier tier);
+  @PUT("promotions/tiers/{id}")
+  Call<TierResponse> updatePromotionTier(@Path("id") String id, @Body Tier tier);
 
-  @DELETE("/promotions/tiers/{id}")
-  Void deletePromotionTier(@Path("id") String id);
+  @DELETE("promotions/tiers/{id}")
+  Call<Void> deletePromotionTier(@Path("id") String id);
 
   // ORDERS
-  @POST("/orders")
-  CreateOrderResponse createOrder(@Body CreateOrder createOrder);
+  @POST("orders")
+  Call<CreateOrderResponse> createOrder(@Body CreateOrder createOrder);
 
-  @GET("/orders/{id}")
-  GetOrderResponse getOrder(@Path("id") String id);
+  @GET("orders/{id}")
+  Call<GetOrderResponse> getOrder(@Path("id") String id);
 
-  @PUT("/orders/{id}")
-  GetOrderResponse updateOrder(@Path("id") String id, @Body UpdateOrder updateOrder);
+  @PUT("orders/{id}")
+  Call<GetOrderResponse> updateOrder(@Path("id") String id, @Body UpdateOrder updateOrder);
 
-  @GET("/orders")
-  ListOrdersResponse listOrders(@QueryMap Map<String, Object> filter);
+  @GET("orders")
+  Call<ListOrdersResponse> listOrders(@QueryMap Map<String, Object> filter);
 
   // EVENTS
-  @POST("/events")
-  CustomEventResponse createCustomEvent(@Body CustomEvent event);
+  @POST("events")
+  Call<CustomEventResponse> createCustomEvent(@Body CustomEvent event);
 }

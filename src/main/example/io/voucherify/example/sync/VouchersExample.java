@@ -21,24 +21,24 @@ public class VouchersExample extends AbsExample {
   }
 
   public void example() {
-    Voucher giftVoucher = Voucher.builder()
-        .type(VoucherType.GIFT_VOUCHER)
-        .gift(Gift.builder().amount(10000).build())
-        .category("Java SDK Example")
-        .redemption(VoucherRedemption.builder().quantity(1).build())
-        .build();
+    Voucher giftVoucher =
+        Voucher.builder()
+            .type(VoucherType.GIFT_VOUCHER)
+            .gift(Gift.builder().amount(10000).build())
+            .category("Java SDK Example")
+            .redemption(VoucherRedemption.builder().quantity(1).build())
+            .build();
 
-    CreateVoucher createVoucher = CreateVoucher.builder()
-        .voucher(giftVoucher)
-        .codeConfig(CodeConfig.builder().pattern("PROMO-#####-2017").build())
-        .build();
+    CreateVoucher createVoucher =
+        CreateVoucher.builder()
+            .voucher(giftVoucher)
+            .codeConfig(CodeConfig.builder().pattern("PROMO-#####-2017").build())
+            .build();
 
     VoucherResponse voucherResponse = client.vouchers().create(createVoucher);
 
-    VoucherUpdate voucherUpdate = VoucherUpdate.builder()
-        .active(false)
-        .metadataEntry("test", true)
-        .build();
+    VoucherUpdate voucherUpdate =
+        VoucherUpdate.builder().active(false).metadataEntry("test", true).build();
 
     client.vouchers().update(voucherResponse.getCode(), voucherUpdate);
 
@@ -48,12 +48,19 @@ public class VouchersExample extends AbsExample {
 
     client.vouchers().get(voucherResponse.getCode());
 
-    Voucher voucher = Voucher.builder().active(false).type(VoucherType.DISCOUNT_VOUCHER).discount(Discount.amountOff(10)).code("test-1").build();
+    Voucher voucher =
+        Voucher.builder()
+            .active(false)
+            .type(VoucherType.DISCOUNT_VOUCHER)
+            .discount(Discount.amountOff(10))
+            .code("test-1")
+            .build();
     ImportVouchers importVouchers = ImportVouchers.builder().voucher(voucher).build();
 
     client.vouchers().importVouchers(importVouchers);
 
-    VouchersResponse vouchers = client.vouchers().list(VouchersFilter.builder().limit(10).page(1).build());
+    VouchersResponse vouchers =
+        client.vouchers().list(VouchersFilter.builder().limit(10).page(1).build());
 
     for (VoucherResponse response : vouchers.getVouchers()) {
       client.vouchers().delete(response.getCode(), true);

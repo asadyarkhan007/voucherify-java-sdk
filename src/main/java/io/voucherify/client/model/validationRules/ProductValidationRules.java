@@ -23,5 +23,4 @@ public class ProductValidationRules {
 
   @Singular("condition")
   private Map<Operator, List<IdPair>> conditions;
-
 }

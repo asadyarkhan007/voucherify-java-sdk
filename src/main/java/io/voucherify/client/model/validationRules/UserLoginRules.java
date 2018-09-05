@@ -21,5 +21,4 @@ public class UserLoginRules {
 
   @Singular("condition")
   protected Map<Operator, List<String>> conditions;
-
 }

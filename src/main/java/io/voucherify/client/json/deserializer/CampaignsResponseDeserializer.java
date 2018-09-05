@@ -22,7 +22,8 @@ public class CampaignsResponseDeserializer extends JsonDeserializer<CampaignsRes
   }
 
   @Override
-  public CampaignsResponse deserialize(JsonParser jp, DeserializationContext ctxt) throws IOException {
+  public CampaignsResponse deserialize(JsonParser jp, DeserializationContext ctxt)
+      throws IOException {
     if (apiVersion == null) {
       return getDefaultCampaignsResponse(jp);
     }
@@ -38,7 +39,8 @@ public class CampaignsResponseDeserializer extends JsonDeserializer<CampaignsRes
         JsonNode campaignsNode = root.get("campaigns");
         CampaignResponse[] campaigns = mapper.convertValue(campaignsNode, CampaignResponse[].class);
 
-        return CampaignsResponse.of(object.asText(), total.asInt(0), dataRef.asText(), Arrays.asList(campaigns));
+        return CampaignsResponse.of(
+            object.asText(), total.asInt(0), dataRef.asText(), Arrays.asList(campaigns));
       default:
         return getDefaultCampaignsResponse(jp);
     }
@@ -48,5 +50,4 @@ public class CampaignsResponseDeserializer extends JsonDeserializer<CampaignsRes
     CampaignResponse[] array = jp.readValueAs(CampaignResponse[].class);
     return CampaignsResponse.of(Arrays.asList(array));
   }
-
 }

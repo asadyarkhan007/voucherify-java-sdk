@@ -1,19 +1,19 @@
 package io.voucherify.client.model.validationRules.response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import io.voucherify.client.model.validationRules.Junction;
 import io.voucherify.client.model.validationRules.OrderValidationRules;
 import io.voucherify.client.model.validationRules.ProductValidationRules;
 import io.voucherify.client.model.validationRules.PublicationValidationRules;
+import io.voucherify.client.model.validationRules.RedemptionValidationRules;
 import io.voucherify.client.model.validationRules.SegmentValidationRules;
+import io.voucherify.client.model.validationRules.SkuValidationRules;
 import io.voucherify.client.model.validationRules.UserValidationRules;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
-import io.voucherify.client.model.validationRules.Junction;
-import io.voucherify.client.model.validationRules.RedemptionValidationRules;
-import io.voucherify.client.model.validationRules.SkuValidationRules;
 
 import java.util.Date;
 

@@ -22,5 +22,4 @@ public class OrderItemResponse {
   private Integer quantity;
 
   private Integer price;
-
 }

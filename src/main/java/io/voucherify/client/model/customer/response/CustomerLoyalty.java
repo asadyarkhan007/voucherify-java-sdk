@@ -21,5 +21,4 @@ public class CustomerLoyalty {
   private Integer referredCustomers;
 
   private Map<String, CustomerCampaignLoyalty> campaigns;
-
 }

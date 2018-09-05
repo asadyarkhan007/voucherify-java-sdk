@@ -30,7 +30,7 @@ public class MetadataValidationRules {
 
   @JsonAnySetter
   public void setRules(String key, MetadataRules value) {
-    if(rules == null) {
+    if (rules == null) {
       rules = new HashMap<String, MetadataRules>();
     }
 

@@ -15,5 +15,4 @@ import lombok.ToString;
 public class DeleteCampaignParams {
 
   private Boolean force;
-
 }

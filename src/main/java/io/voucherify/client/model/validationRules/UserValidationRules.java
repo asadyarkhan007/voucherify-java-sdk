@@ -19,5 +19,4 @@ public class UserValidationRules {
 
   @JsonProperty("user_login")
   private UserLoginRules userLogin;
-
 }

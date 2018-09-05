@@ -37,5 +37,4 @@ public class OrderValidationRules {
   @JsonProperty("all_orders_discount_amount")
   @Singular("allOrdersDiscountAmountCondition")
   private Map<Operator, List<Integer>> allOrdersDiscountAmount;
-
 }

@@ -25,5 +25,4 @@ public class Order {
 
   @Singular("item")
   private List<OrderItem> items;
-
 }

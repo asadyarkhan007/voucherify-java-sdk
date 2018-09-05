@@ -1,13 +1,14 @@
 package io.voucherify.client.module;
 
+import io.reactivex.Observable;
 import io.voucherify.client.api.VoucherifyApi;
+import io.voucherify.client.callback.VoucherifyCallback;
 import io.voucherify.client.model.validationRules.ValidationRules;
 import io.voucherify.client.model.validationRules.response.ValidationRulesResponse;
-import io.voucherify.client.callback.VoucherifyCallback;
 import io.voucherify.client.module.ValidationRulesModule.ExtAsync;
 import io.voucherify.client.module.ValidationRulesModule.ExtRxJava;
+import io.voucherify.client.utils.Irrelevant;
 import io.voucherify.client.utils.RxUtils;
-import rx.Observable;
 
 import java.util.concurrent.Executor;
 
@@ -18,19 +19,19 @@ public final class ValidationRulesModule extends AbsModule<ExtAsync, ExtRxJava> 
   }
 
   public ValidationRulesResponse create(ValidationRules validationRules) {
-    return api.createValidationRules(validationRules);
+    return executeSyncApiCall(api.createValidationRules(validationRules));
   }
 
   public ValidationRulesResponse get(String id) {
-    return api.getValidationRules(id);
+    return executeSyncApiCall(api.getValidationRules(id));
   }
 
   public ValidationRulesResponse update(ValidationRules validationRules) {
-    return api.updateValidationRules(validationRules.getId(), validationRules);
+    return executeSyncApiCall(api.updateValidationRules(validationRules.getId(), validationRules));
   }
 
   public void delete(String id) {
-    api.deleteValidationRules(id);
+    executeSyncApiCall(api.deleteValidationRules(id));
   }
 
   @Override
@@ -55,7 +56,8 @@ public final class ValidationRulesModule extends AbsModule<ExtAsync, ExtRxJava> 
 
   public class ExtAsync extends AbsModule.Async {
 
-    public void create(ValidationRules validationRules, VoucherifyCallback<ValidationRulesResponse> callback) {
+    public void create(
+        ValidationRules validationRules, VoucherifyCallback<ValidationRulesResponse> callback) {
       RxUtils.subscribe(executor, rx().create(validationRules), callback);
     }
 
@@ -63,11 +65,12 @@ public final class ValidationRulesModule extends AbsModule<ExtAsync, ExtRxJava> 
       RxUtils.subscribe(executor, rx().get(id), callback);
     }
 
-    public void update(ValidationRules validationRules, VoucherifyCallback<ValidationRulesResponse> callback) {
+    public void update(
+        ValidationRules validationRules, VoucherifyCallback<ValidationRulesResponse> callback) {
       RxUtils.subscribe(executor, rx().update(validationRules), callback);
     }
 
-    public void delete(String id, VoucherifyCallback<Void> callback) {
+    public void delete(String id, VoucherifyCallback<Irrelevant> callback) {
       RxUtils.subscribe(executor, rx().delete(id), callback);
     }
   }
@@ -75,41 +78,48 @@ public final class ValidationRulesModule extends AbsModule<ExtAsync, ExtRxJava> 
   public class ExtRxJava extends AbsModule.Rx {
 
     public Observable<ValidationRulesResponse> create(final ValidationRules validationRules) {
-      return RxUtils.defer(new RxUtils.DefFunc<ValidationRulesResponse>() {
-        @Override
-        public ValidationRulesResponse method() {
-          return ValidationRulesModule.this.create(validationRules);
-        }
-      });
+      return RxUtils.defer(
+          new RxUtils.DefFunc<ValidationRulesResponse>() {
+
+            @Override
+            public ValidationRulesResponse method() {
+              return ValidationRulesModule.this.create(validationRules);
+            }
+          });
     }
 
     public Observable<ValidationRulesResponse> get(final String id) {
-      return RxUtils.defer(new RxUtils.DefFunc<ValidationRulesResponse>() {
-        @Override
-        public ValidationRulesResponse method() {
-          return ValidationRulesModule.this.get(id);
-        }
-      });
+      return RxUtils.defer(
+          new RxUtils.DefFunc<ValidationRulesResponse>() {
+
+            @Override
+            public ValidationRulesResponse method() {
+              return ValidationRulesModule.this.get(id);
+            }
+          });
     }
 
     public Observable<ValidationRulesResponse> update(final ValidationRules validationRules) {
-      return RxUtils.defer(new RxUtils.DefFunc<ValidationRulesResponse>() {
-        @Override
-        public ValidationRulesResponse method() {
-          return ValidationRulesModule.this.update(validationRules);
-        }
-      });
+      return RxUtils.defer(
+          new RxUtils.DefFunc<ValidationRulesResponse>() {
+
+            @Override
+            public ValidationRulesResponse method() {
+              return ValidationRulesModule.this.update(validationRules);
+            }
+          });
     }
 
-    public Observable<Void> delete(final String id) {
-      return RxUtils.defer(new RxUtils.DefFunc<Void>() {
-        @Override
-        public Void method() {
-          ValidationRulesModule.this.delete(id);
-          return null;
-        }
-      });
+    public Observable<Irrelevant> delete(final String id) {
+      return RxUtils.defer(
+          new RxUtils.DefFunc<Irrelevant>() {
+
+            @Override
+            public Irrelevant method() {
+              ValidationRulesModule.this.delete(id);
+              return Irrelevant.NO_RESPONSE;
+            }
+          });
     }
   }
-
 }

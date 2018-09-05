@@ -1,6 +1,6 @@
 package io.voucherify.client.module;
 
-import com.squareup.okhttp.mockwebserver.RecordedRequest;
+import io.reactivex.Observable;
 import io.voucherify.client.callback.VoucherifyCallback;
 import io.voucherify.client.model.campaign.AddVoucherToCampaign;
 import io.voucherify.client.model.campaign.CampaignImportVoucher;
@@ -11,8 +11,9 @@ import io.voucherify.client.model.campaign.DeleteCampaignParams;
 import io.voucherify.client.model.campaign.UpdateCampaign;
 import io.voucherify.client.model.campaign.response.AddVoucherToCampaignResponse;
 import io.voucherify.client.model.campaign.response.CampaignResponse;
+import io.voucherify.client.utils.Irrelevant;
+import okhttp3.mockwebserver.RecordedRequest;
 import org.junit.Test;
-import rx.Observable;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -23,10 +24,7 @@ public class CampaignsModuleTest extends AbstractModuleTest {
   @Test
   public void shouldCreateCampaign() {
     // given
-    CreateCampaign createCampaign = CreateCampaign
-            .builder()
-            .name("name")
-            .build();
+    CreateCampaign createCampaign = CreateCampaign.builder().name("name").build();
 
     enqueueResponse("{\"name\" : \"name\"}");
 
@@ -44,15 +42,13 @@ public class CampaignsModuleTest extends AbstractModuleTest {
   @Test
   public void shouldAddVoucherToCampaign() {
     // given
-    AddVoucherToCampaign addVoucher = AddVoucherToCampaign
-            .builder()
-            .category("category")
-            .build();
+    AddVoucherToCampaign addVoucher = AddVoucherToCampaign.builder().category("category").build();
 
     enqueueResponse("{\"campaign\": \"campaign-name\"}");
 
     // when
-    AddVoucherToCampaignResponse result = client.campaigns().addVoucher("campaign-name", addVoucher);
+    AddVoucherToCampaignResponse result =
+        client.campaigns().addVoucher("campaign-name", addVoucher);
 
     // then
     assertThat(result).isNotNull();
@@ -65,15 +61,13 @@ public class CampaignsModuleTest extends AbstractModuleTest {
   @Test
   public void shouldAddVoucherWithCodeToCampaign() {
     // given
-    AddVoucherToCampaign addVoucher = AddVoucherToCampaign
-            .builder()
-            .category("category")
-            .build();
+    AddVoucherToCampaign addVoucher = AddVoucherToCampaign.builder().category("category").build();
 
     enqueueResponse("{\"campaign\": \"campaign-name\", \"code\": \"some-code\"}");
 
     // when
-    AddVoucherToCampaignResponse result = client.campaigns().addVoucherWithCode("campaign-name", "some-code", addVoucher);
+    AddVoucherToCampaignResponse result =
+        client.campaigns().addVoucherWithCode("campaign-name", "some-code", addVoucher);
 
     // then
     assertThat(result).isNotNull();
@@ -102,8 +96,10 @@ public class CampaignsModuleTest extends AbstractModuleTest {
   @Test
   public void shouldImportVouchers() {
     // given
-    CampaignImportVoucher voucher = CampaignImportVoucher.builder().active(true).code("some-code").build();
-    CampaignImportVouchers campaignImportVouchers = CampaignImportVouchers.builder().voucher(voucher).build();
+    CampaignImportVoucher voucher =
+        CampaignImportVoucher.builder().active(true).code("some-code").build();
+    CampaignImportVouchers campaignImportVouchers =
+        CampaignImportVouchers.builder().voucher(voucher).build();
     enqueueEmptyResponse();
 
     // when
@@ -133,10 +129,7 @@ public class CampaignsModuleTest extends AbstractModuleTest {
   @Test
   public void shouldCreateCampaignAsync() {
     // given
-    CreateCampaign createCampaign = CreateCampaign
-            .builder()
-            .name("name")
-            .build();
+    CreateCampaign createCampaign = CreateCampaign.builder().name("name").build();
 
     enqueueResponse("{\"name\" : \"name\"}");
 
@@ -155,10 +148,7 @@ public class CampaignsModuleTest extends AbstractModuleTest {
   @Test
   public void shouldAddVoucherToCampaignAsync() {
     // given
-    AddVoucherToCampaign addVoucher = AddVoucherToCampaign
-            .builder()
-            .category("category")
-            .build();
+    AddVoucherToCampaign addVoucher = AddVoucherToCampaign.builder().category("category").build();
 
     enqueueResponse("{\"campaign\": \"campaign-name\"}");
 
@@ -177,17 +167,17 @@ public class CampaignsModuleTest extends AbstractModuleTest {
   @Test
   public void shouldAddVoucherWithCodeToCampaignAsync() {
     // given
-    AddVoucherToCampaign addVoucher = AddVoucherToCampaign
-            .builder()
-            .category("category")
-            .build();
+    AddVoucherToCampaign addVoucher = AddVoucherToCampaign.builder().category("category").build();
 
     enqueueResponse("{\"campaign\": \"campaign-name\", \"code\": \"some-code\"}");
 
     VoucherifyCallback callback = createCallback();
 
     // when
-    client.campaigns().async().addVoucherWithCode("campaign-name", "some-code", addVoucher, callback);
+    client
+        .campaigns()
+        .async()
+        .addVoucherWithCode("campaign-name", "some-code", addVoucher, callback);
 
     // then
     await().atMost(5, SECONDS).until(wasCallbackFired());
@@ -216,8 +206,10 @@ public class CampaignsModuleTest extends AbstractModuleTest {
   @Test
   public void shouldImportVouchersAsync() {
     // given
-    CampaignImportVoucher voucher = CampaignImportVoucher.builder().active(true).code("some-code").build();
-    CampaignImportVouchers campaignImportVouchers = CampaignImportVouchers.builder().voucher(voucher).build();
+    CampaignImportVoucher voucher =
+        CampaignImportVoucher.builder().active(true).code("some-code").build();
+    CampaignImportVouchers campaignImportVouchers =
+        CampaignImportVouchers.builder().voucher(voucher).build();
     VoucherifyCallback callback = createCallback();
     enqueueEmptyResponse();
 
@@ -251,10 +243,7 @@ public class CampaignsModuleTest extends AbstractModuleTest {
   @Test
   public void shouldCreateCampaignRxJava() {
     // given
-    CreateCampaign createCampaign = CreateCampaign
-            .builder()
-            .name("name")
-            .build();
+    CreateCampaign createCampaign = CreateCampaign.builder().name("name").build();
 
     enqueueResponse("{\"name\" : \"name\"}");
 
@@ -262,7 +251,7 @@ public class CampaignsModuleTest extends AbstractModuleTest {
     Observable<CampaignResponse> observable = client.campaigns().rx().create(createCampaign);
 
     // then
-    CampaignResponse result = observable.toBlocking().first();
+    CampaignResponse result = observable.blockingFirst();
     assertThat(result).isNotNull();
     RecordedRequest request = getRequest();
     assertThat(request.getPath()).isEqualTo("/campaigns");
@@ -272,18 +261,16 @@ public class CampaignsModuleTest extends AbstractModuleTest {
   @Test
   public void shouldAddVoucherToCampaignRxJava() {
     // given
-    AddVoucherToCampaign addVoucher = AddVoucherToCampaign
-            .builder()
-            .category("category")
-            .build();
+    AddVoucherToCampaign addVoucher = AddVoucherToCampaign.builder().category("category").build();
 
     enqueueResponse("{\"campaign\": \"campaign-name\"}");
 
     // when
-    Observable<AddVoucherToCampaignResponse> observable = client.campaigns().rx().addVoucher("campaign-name", addVoucher);
+    Observable<AddVoucherToCampaignResponse> observable =
+        client.campaigns().rx().addVoucher("campaign-name", addVoucher);
 
     // then
-    AddVoucherToCampaignResponse result = observable.toBlocking().first();
+    AddVoucherToCampaignResponse result = observable.blockingFirst();
     assertThat(result).isNotNull();
     RecordedRequest request = getRequest();
     assertThat(request.getPath()).isEqualTo("/campaigns/campaign-name/vouchers");
@@ -293,18 +280,16 @@ public class CampaignsModuleTest extends AbstractModuleTest {
   @Test
   public void shouldAddVoucherWithCodeToCampaignRxJava() {
     // given
-    AddVoucherToCampaign addVoucher = AddVoucherToCampaign
-            .builder()
-            .category("category")
-            .build();
+    AddVoucherToCampaign addVoucher = AddVoucherToCampaign.builder().category("category").build();
 
     enqueueResponse("{\"campaign\": \"campaign-name\", \"code\": \"some-code\"}");
 
     // when
-    Observable<AddVoucherToCampaignResponse> observable = client.campaigns().rx().addVoucherWithCode("campaign-name", "some-code", addVoucher);
+    Observable<AddVoucherToCampaignResponse> observable =
+        client.campaigns().rx().addVoucherWithCode("campaign-name", "some-code", addVoucher);
 
     // then
-    AddVoucherToCampaignResponse result = observable.toBlocking().first();
+    AddVoucherToCampaignResponse result = observable.blockingFirst();
     assertThat(result).isNotNull();
     RecordedRequest request = getRequest();
     assertThat(request.getPath()).isEqualTo("/campaigns/campaign-name/vouchers/some-code");
@@ -318,10 +303,10 @@ public class CampaignsModuleTest extends AbstractModuleTest {
     enqueueEmptyResponse();
 
     // when
-    Observable<Void> observable = client.campaigns().rx().delete("campaign-name", params);
+    Observable<Irrelevant> observable = client.campaigns().rx().delete("campaign-name", params);
 
     // then
-    observable.toBlocking().first();
+    observable.blockingFirst();
     RecordedRequest request = getRequest();
     assertThat(request.getPath()).isEqualTo("/campaigns/campaign-name?force=true");
     assertThat(request.getMethod()).isEqualTo("DELETE");
@@ -330,15 +315,18 @@ public class CampaignsModuleTest extends AbstractModuleTest {
   @Test
   public void shouldImportVouchersRxJava() {
     // given
-    CampaignImportVoucher voucher = CampaignImportVoucher.builder().active(true).code("some-code").build();
-    CampaignImportVouchers campaignImportVouchers = CampaignImportVouchers.builder().voucher(voucher).build();
+    CampaignImportVoucher voucher =
+        CampaignImportVoucher.builder().active(true).code("some-code").build();
+    CampaignImportVouchers campaignImportVouchers =
+        CampaignImportVouchers.builder().voucher(voucher).build();
     enqueueEmptyResponse();
 
     // when
-    Observable<Void> observable = client.campaigns().rx().importVouchers("campaign-name", campaignImportVouchers);
+    Observable<Irrelevant> observable =
+        client.campaigns().rx().importVouchers("campaign-name", campaignImportVouchers);
 
     // then
-    observable.toBlocking().first();
+    observable.blockingFirst();
     RecordedRequest request = getRequest();
     assertThat(request.getPath()).isEqualTo("/campaigns/campaign-name/import");
     assertThat(request.getMethod()).isEqualTo("POST");
@@ -352,10 +340,11 @@ public class CampaignsModuleTest extends AbstractModuleTest {
     enqueueResponse("{\"campaign\": \"campaign-name\", \"type\": \"AUTO_UPDATE\"}");
 
     // when
-    Observable<CampaignResponse> observable = client.campaigns().rx().update("campaign-name", updateCampaign);
+    Observable<CampaignResponse> observable =
+        client.campaigns().rx().update("campaign-name", updateCampaign);
 
     // then
-    CampaignResponse result = observable.toBlocking().first();
+    CampaignResponse result = observable.blockingFirst();
     RecordedRequest request = getRequest();
     assertThat(result).isNotNull();
     assertThat(request.getPath()).isEqualTo("/campaigns/campaign-name");

@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import io.voucherify.client.model.order.response.OrderResponse;
 import io.voucherify.client.model.voucher.Discount;
 import io.voucherify.client.model.voucher.Gift;
-import io.voucherify.client.model.voucher.VoucherType;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -35,5 +34,4 @@ public class VoucherValidationResponse {
   private String trackingId;
 
   private Map<String, Object> metadata;
-
 }
