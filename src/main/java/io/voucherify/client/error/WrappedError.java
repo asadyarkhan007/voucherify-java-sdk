@@ -3,8 +3,10 @@ package io.voucherify.client.error;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
+import lombok.ToString;
 
 @Getter
+@ToString
 class WrappedError {
 
   @JsonCreator

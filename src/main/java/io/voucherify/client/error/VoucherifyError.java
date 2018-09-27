@@ -21,9 +21,9 @@ public class VoucherifyError extends RuntimeException {
 
   private VoucherifyError(WrappedError error) {
     super(error != null ? error.getMessage() : "unknown");
-    this.code = error != null ? error.getCode() : 500;
-    this.details = error != null ? error.getDetails() : "unknown";
-    this.key = error != null ? error.getKey() : "unknown";
+    this.code = error != null ? ObjectUtils.firstNonNull(error.getCode(), 500) : 500;
+    this.details = error != null ? ObjectUtils.firstNonNull(error.getDetails(), "unknown") : "unknown";
+    this.key = error != null ? ObjectUtils.firstNonNull(error.getKey(), "unknown") : "unknown";
   }
 
   private VoucherifyError(String message, Throwable throwable, Integer code, String details, String key) {
